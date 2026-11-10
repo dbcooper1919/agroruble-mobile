@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroRuble - Ödül ve Çekim Merkezi</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#121218">
+    <style>
+        :root {
+            --bg-color: #121218;
+            --card-bg: #1e1e2d;
+            --accent: #00ffcc;
+            --accent-glow: rgba(0, 255, 204, 0.1);
+            --text-main: #ffffff;
+            --text-muted: #b0b0c0;
+            --border: #2a2a3d;
+        }
+        body { background: var(--bg-color); color: var(--text-main); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; box-sizing: border-box; }
+        .container { background: var(--card-bg); padding: 25px; border-radius: 16px; width: 100%; max-width: 500px; border: 1px solid var(--border); box-sizing: border-box; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        h2 { color: var(--accent); text-align: center; margin-bottom: 20px; font-size: 22px; letter-spacing: 0.5px; }
+        .user-box { background: #162b32; padding: 15px; border-radius: 10px; border: 1px solid rgba(0,255,204,0.3); margin-bottom: 20px; font-size: 13px; line-height: 1.6; }
+        .user-box b { color: var(--accent); }
+        label { color: var(--text-muted); font-size: 12px; display: block; margin-top: 10px; font-weight: 600; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid var(--border); background: #181822; color: #fff; box-sizing: border-box; font-size: 14px; outline: none; transition: border 0.3s; }
+        input:focus, select:focus { border-color: var(--accent); }
+        button { width: 100%; padding: 14px; background: var(--accent); color: #121218; font-weight: bold; cursor: pointer; margin-top: 20px; border: none; border-radius: 8px; font-size: 15px; transition: opacity 0.2s; }
+        button:hover { opacity: 0.9; }
+        button.admin-btn { background: #33334d; color: var(--accent); border: 1px dashed var(--accent); margin-top: 15px; font-size: 13px; padding: 10px; }
+        .success { color: var(--accent); text-align: center; margin-top: 15px; font-size: 13px; background: var(--accent-glow); padding: 10px; border-radius: 8px; border: 1px solid rgba(0,255,204,0.2); }
+        .error { color: #ff4d4d; text-align: center; margin-top: 15px; font-size: 13px; background: rgba(255,77,77,0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,77,77,0.2); }
+        
+        /* Gelişmiş Admin Paneli Tasarımı */
+        #adminPanel { display: none; margin-top: 25px; border-top: 2px solid var(--border); padding-top: 20px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .stat-card { background: #181822; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
+        .stat-card span { display: block; font-size: 16px; font-weight: bold; color: var(--accent); margin-top: 4px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        th, td { padding: 10px 8px; border-bottom: 1px solid var(--border); text-align: left; }
+        th { color: var(--accent); background: #181822; font-weight: 600; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 10px; text-transform: uppercase; }
+        .bekliyor { background: rgba(255,170,0,0.15); color: #ffaa00; border: 1px solid rgba(255,170,0,0.3); }
+        .odendi { background: rgba(0,255,204,0.15); color: var(--accent); border: 1px solid rgba(0,255,204,0.3); }
+        .mini-btn { padding: 6px 12px; background: var(--accent); color: #121218; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
+        .mini-btn:hover { background: #00cca3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Kullanıcı Çekim Ekranı -->
+        <div id="userView">
+            <h2>💰 Ödül & Çekim Merkezi</h2>
+            
+            <div class="user-box">
+                🆔 <b>Kullanıcı:</b> <span id="userName">Yükleniyor...</span><br>
+                ⭐ <b>Mevcut Puanınız:</b> <span id="puanDisplay">0</span> Puan<br>
+                💵 <b>TL Karşılığı:</b> <span id="tlDisplay">0.00 TL</span> (Min: 10 TL)
+            </div>
+
+            <div id="msgBox"></div>
+            
+            <form id="withdrawForm" onsubmit="submitWithdraw(event)">
+                <label>İsim Soyisim:</label>
+                <input type="text" id="isimSoyisim" placeholder="Adınız Soyadınız" required>
+
+                <label>Banka / Cüzdan Adı:</label>
+                <select id="banka" required>
+                    <option value="">Banka Seçiniz</option>
+                    <option value="Papara">Papara</option>
+                    <option value="Ziraat Bankası">Ziraat Bankası</option>
+                    <option value="Garanti BBVA">Garanti BBVA</option>
+                    <option value="İş Bankası">İş Bankası</option>
+                    <option value="Akbank">Akbank</option>
+                    <option value="Yapı Kredi">Yapı Kredi</option>
+                    <option value="Enpara">Enpara</option>
+                    <option value="Diğer">Diğer</option>
+                </select>
+
+                <label>IBAN veya Hesap Numarası:</label>
+                <input type="text" id="iban" placeholder="TR..." required>
+
+                <label>Çekilmek İstenen Puan (Min: 2600 P = 10 TL):</label>
+                <input type="number" id="talepPuan" placeholder="Örn: 3000" min="2600" step="any" required>
+                
+                <button type="submit">Çekim Talebi Oluştur</button>
+            </form>
+            
+            <button class="admin-btn" onclick="toggleAdminLogin()">👑 Yönetici Paneli Girişi</button>
+        </div>
+
+        <!-- Gelişmiş Admin Paneli -->
+        <div id="adminPanel">
+            <h2>👑 Gelişmiş Admin Paneli</h2>
+            <div id="adminLoginBox">
+                <label>Yönetici Şifresi:</label>
+                <input type="password" id="adminPass" placeholder="Şifrenizi girin">
+                <button onclick="checkAdmin()">Giriş Yap</button>
+            </div>
+            
+            <div id="adminContent" style="display:none; margin-top: 15px;">
+                <!-- İstatistik Kartları -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        Bekleyen Talep<span id="statBekleyen" style="color:#ffaa00;">0</span>
+                    </div>
+                    <div class="stat-card">
+                        Toplam Ödenen<span id="statOdenen" style="color:#00ffcc;">0 TL</span>
+                    </div>
+                </div>
+
+                <p style="color:var(--accent); font-size:13px; margin: 15px 0 5px 0; font-weight:bold;">📋 Tüm Çekim Talepleri:</p>
+                <div style="overflow-x:auto; max-height:350px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Kullanıcı / IBAN</th>
+                                <th>Tutar</th>
+                                <th>Durum</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="talepListesi">
+                            <!-- Veriler dinamik dolacak -->
+                        </tbody>
+                    </table>
+                </div>
+                <button style="background:#ff4d4d; margin-top:20px; color:#fff;" onclick="logoutAdmin()">Güvenli Çıkış</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase ve Uygulama Mantığı -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, get, update, push, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA-3zxKcxmWQjVWnvoucMr_t59Cr0ACNYI",
+            authDomain: "agroruble-9ceb2.firebaseapp.com",
+            databaseURL: "https://agroruble-9ceb2-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "agroruble-9ceb2",
+            storageBucket: "agroruble-9ceb2.firebasestorage.app",
+            messagingSenderId: "544706258082",
+            appId: "1:544706258082:web:b63004049df52988a023fb",
+            measurementId: "G-0PQDCFZ0M9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const uid = urlParams.get('uid');
+
+        let userCurrentScore = 0;
+        let userFullName = "";
+
+        if (uid) {
+            const userRef = ref(db, 'users/' + uid);
+            get(userRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    userCurrentScore = data.score || 0;
+                    userFullName = (data.name || '') + ' ' + (data.surname || '');
+                    
+                    document.getElementById('userName').innerText = userFullName.trim() || data.username || 'Kullanıcı';
+                    document.getElementById('puanDisplay').innerText = userCurrentScore.toLocaleString();
+                    document.getElementById('tlDisplay').innerText = ((userCurrentScore / 100) * 0.38).toFixed(2) + " TL";
+                    document.getElementById('isimSoyisim').value = userFullName.trim();
+                } else {
+                    document.getElementById('userName').innerText = "Kullanıcı Bulunamadı";
+                }
+            });
+        } else {
+            document.getElementById('userName').innerText = "Doğrudan Erişim (UID Yok)";
+        }
+
+        window.submitWithdraw = function(e) {
+            e.preventDefault();
+            const talepPuan = parseFloat(document.getElementById('talepPuan').value);
+            const banka = document.getElementById('banka').value;
+            const iban = document.getElementById('iban').value;
+            const isimSoyisim = document.getElementById('isimSoyisim').value;
+            const msgBox = document.getElementById('msgBox');
+
+            if (!uid) {
+                msgBox.innerHTML = `<div class='error'>Hata: Mobil uygulama Kimliği (UID) bulunamadı!</div>`;
+                return;
+            }
+
+            if (talepPuan > userCurrentScore) {
+                msgBox.innerHTML = `<div class='error'>Hesabınızda yeterli puan yok! (Mevcut: ${userCurrentScore} P)</div>`;
+                return;
+            }
+
+            if (talepPuan < 2600) {
+                msgBox.innerHTML = `<div class='error'>Minimum çekim tutarı 2600 Puandır (10 TL).</div>`;
+                return;
+            }
+
+            const yeniPuan = userCurrentScore - talepPuan;
+            update(ref(db, 'users/' + uid), { score: yeniPuan }).then(() => {
+                const withdrawalsRef = ref(db, 'withdrawals');
+                const newWithdrawalRef = push(withdrawalsRef);
+                set(newWithdrawalRef, {
+                    uid: uid,
+                    isim_soyisim: isimSoyisim,
+                    banka: banka,
+                    iban: iban,
+                    puan: talepPuan,
+                    tl_tutar: ((talepPuan / 100) * 0.38).toFixed(2),
+                    durum: 'Bekliyor',
+                    tarih: new Date().toLocaleString()
+                });
+
+                msgBox.innerHTML = `<div class='success'>Başarılı! ${talepPuan} Puan çekim talebiniz alındı ve puanınızdan düşüldü.</div>`;
+                document.getElementById('puanDisplay').innerText = yeniPuan.toLocaleString();
+                document.getElementById('tlDisplay').innerText = ((yeniPuan / 100) * 0.38).toFixed(2) + " TL";
+                userCurrentScore = yeniPuan;
+                document.getElementById('withdrawForm').reset();
+            }).catch((error) => {
+                msgBox.innerHTML = `<div class='error'>Kayıt hatası: ${error.message}</div>`;
+            });
+        }
+
+        // Gelişmiş Admin Veri Dinleyicisi ve İstatistikler
+        const withdrawalsRef = ref(db, 'withdrawals');
+        onValue(withdrawalsRef, (snapshot) => {
+            const data = snapshot.val();
+            const tbody = document.getElementById('talepListesi');
+            tbody.innerHTML = '';
+            
+            let bekleyenSayisi = 0;
+            let toplamOdenenTL = 0;
+
+            if (data) {
+                Object.keys(data).reverse().forEach((key) => {
+                    const item = data[key];
+                    if (item.durum === 'Bekliyor') bekleyenSayisi++;
+                    if (item.durum === 'Ödendi') toplamOdenenTL += parseFloat(item.tl_tutar || 0);
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><b>${item.isim_soyisim}</b><br><small style="color:#888;">${item.banka}</small><br><span style="color:var(--accent); font-size:11px;">${item.iban}</span></td>
+                        <td><b>${item.puan} P</b><br><span style="color:#888;">${item.tl_tutar} TL</span></td>
+                        <td><span class="badge ${item.durum === 'Ödendi' ? 'odendi' : 'bekliyor'}">${item.durum}</span></td>
+                        <td>${item.durum !== 'Ödendi' ? `<button class="mini-btn" onclick="markAsPaid('${key}')">Öde</button>` : '✅'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">Henüz çekim talebi bulunmuyor.</td></tr>`;
+            }
+
+            document.getElementById('statBekleyen').innerText = bekleyenSayisi;
+            document.getElementById('statOdenen').innerText = toplamOdenenTL.toFixed(2) + " TL";
+        });
+
+        window.markAsPaid = function(key) {
+            update(ref(db, 'withdrawals/' + key), { durum: 'Ödendi' });
+        }
+    </script>
+
+    <script>
+        function toggleAdminLogin() {
+            const panel = document.getElementById('adminPanel');
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function checkAdmin() {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === "123456") { // İstediğiniz şifreyi buraya yazabilirsiniz
+                document.getElementById('adminLoginBox').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+            } else {
+                alert("Yönetici şifresi hatalı!");
+            }
+        }
+
+        function logoutAdmin() {
+            document.getElementById('adminLoginBox').style.display = 'block';
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('adminPass').value = '';
+        }
+
+        // Service Worker Kaydı (PWA Desteği)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(() => {});
+            });
+        }
+    </script>
+</body>
+</html>
