@@ -26,12 +26,15 @@
         input:focus, select:focus { border-color: var(--accent); }
         button { width: 100%; padding: 14px; background: var(--accent); color: #121218; font-weight: bold; cursor: pointer; margin-top: 20px; border: none; border-radius: 8px; font-size: 15px; transition: opacity 0.2s; }
         button:hover { opacity: 0.9; }
-        button.admin-btn { background: #33334d; color: var(--accent); border: 1px dashed var(--accent); margin-top: 15px; font-size: 13px; padding: 10px; }
         .success { color: var(--accent); text-align: center; margin-top: 15px; font-size: 13px; background: var(--accent-glow); padding: 10px; border-radius: 8px; border: 1px solid rgba(0,255,204,0.2); }
         .error { color: #ff4d4d; text-align: center; margin-top: 15px; font-size: 13px; background: rgba(255,77,77,0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,77,77,0.2); }
         
-        /* Gelişmiş Admin Paneli Tasarımı */
-        #adminPanel { display: none; margin-top: 25px; border-top: 2px solid var(--border); padding-top: 20px; }
+        /* Kanıtlar (Ödenenler) Listesi */
+        .proof-section { margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px; }
+        .proof-title { color: var(--accent); font-size: 14px; margin-bottom: 10px; font-weight: bold; }
+        
+        /* Admin Paneli (Başlangıçta Gizli) */
+        #adminPanel { display: none; margin-top: 25px; border-top: 2px solid var(--accent); padding-top: 20px; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .stat-card { background: #181822; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
         .stat-card span { display: block; font-size: 16px; font-weight: bold; color: var(--accent); margin-top: 4px; }
@@ -43,7 +46,6 @@
         .bekliyor { background: rgba(255,170,0,0.15); color: #ffaa00; border: 1px solid rgba(255,170,0,0.3); }
         .odendi { background: rgba(0,255,204,0.15); color: var(--accent); border: 1px solid rgba(0,255,204,0.3); }
         .mini-btn { padding: 6px 12px; background: var(--accent); color: #121218; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
-        .mini-btn:hover { background: #00cca3; }
     </style>
 </head>
 <body>
@@ -85,11 +87,28 @@
                 
                 <button type="submit">Çekim Talebi Oluştur</button>
             </form>
-            
-            <button class="admin-btn" onclick="toggleAdminLogin()">👑 Yönetici Paneli Girişi</button>
+
+            <!-- Herkesin Görebileceği Ödeme Kanıtları (Şeffaflık) -->
+            <div class="proof-section">
+                <div class="proof-title">🏆 Son Ödeme Kanıtları (Tamamlananlar)</div>
+                <div style="overflow-x:auto; max-height:160px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>İsim (Gizli IBAN)</th>
+                                <th>Tutar</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kanitListesi">
+                            <tr><td colspan="3" style="text-align:center; color:#888;">Yükleniyor...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
-        <!-- Gelişmiş Admin Paneli -->
+        <!-- Gizli Admin Paneli (Sadece ?admin=1 ile görünür) -->
         <div id="adminPanel">
             <h2>👑 Gelişmiş Admin Paneli</h2>
             <div id="adminLoginBox">
@@ -99,7 +118,6 @@
             </div>
             
             <div id="adminContent" style="display:none; margin-top: 15px;">
-                <!-- İstatistik Kartları -->
                 <div class="stats-grid">
                     <div class="stat-card">
                         Bekleyen Talep<span id="statBekleyen" style="color:#ffaa00;">0</span>
@@ -109,8 +127,8 @@
                     </div>
                 </div>
 
-                <p style="color:var(--accent); font-size:13px; margin: 15px 0 5px 0; font-weight:bold;">📋 Tüm Çekim Talepleri:</p>
-                <div style="overflow-x:auto; max-height:350px;">
+                <p style="color:var(--accent); font-size:13px; margin: 15px 0 5px 0; font-weight:bold;">📋 Yönetim Paneli (Tüm Talepler):</p>
+                <div style="overflow-x:auto; max-height:300px;">
                     <table>
                         <thead>
                             <tr>
@@ -121,7 +139,7 @@
                             </tr>
                         </thead>
                         <tbody id="talepListesi">
-                            <!-- Veriler dinamik dolacak -->
+                            <!-- Yönetici listesi -->
                         </tbody>
                     </table>
                 </div>
@@ -130,7 +148,7 @@
         </div>
     </div>
 
-    <!-- Firebase ve Uygulama Mantığı -->
+    <!-- Firebase SDK ve Mantık -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getDatabase, ref, get, update, push, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
@@ -151,6 +169,12 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const uid = urlParams.get('uid');
+        const isAdminMode = urlParams.get('admin');
+
+        // Eğer URL'de ?admin=1 varsa kullanıcı ekranını gizle, admin panelini aç
+        if (isAdminMode === '1') {
+            document.getElementById('adminPanel').style.display = 'block';
+        }
 
         let userCurrentScore = 0;
         let userFullName = "";
@@ -179,7 +203,7 @@
             e.preventDefault();
             const talepPuan = parseFloat(document.getElementById('talepPuan').value);
             const banka = document.getElementById('banka').value;
-            const iban = document.getElementById('iban').value;
+            const iban = document.getElementById('iban'].value;
             const isimSoyisim = document.getElementById('isimSoyisim').value;
             const msgBox = document.getElementById('msgBox');
 
@@ -223,33 +247,58 @@
             });
         }
 
-        // Gelişmiş Admin Veri Dinleyicisi ve İstatistikler
+        // Verileri Dinle (Hem Kanıtlar Listesi hem Admin Paneli için)
         const withdrawalsRef = ref(db, 'withdrawals');
         onValue(withdrawalsRef, (snapshot) => {
             const data = snapshot.val();
-            const tbody = document.getElementById('talepListesi');
-            tbody.innerHTML = '';
+            const tbodyAdmin = document.getElementById('talepListesi');
+            const tbodyKanit = document.getElementById('kanitListesi');
+            
+            tbodyAdmin.innerHTML = '';
+            tbodyKanit.innerHTML = '';
             
             let bekleyenSayisi = 0;
             let toplamOdenenTL = 0;
+            let kanitSayisi = 0;
 
             if (data) {
                 Object.keys(data).reverse().forEach((key) => {
                     const item = data[key];
                     if (item.durum === 'Bekliyor') bekleyenSayisi++;
-                    if (item.durum === 'Ödendi') toplamOdenenTL += parseFloat(item.tl_tutar || 0);
+                    if (item.durum === 'Ödendi') {
+                        toplamOdenenTL += parseFloat(item.tl_tutar || 0);
+                        
+                        // Kanitlar listesi için gizlenmiş IBAN (Güvenlik için sadece ilk ve son karakterler görünür)
+                        const gizliIban = item.iban ? item.iban.substring(0, 4) + " **** **** " + item.iban.slice(-4) : "TR** ****";
+                        const gizliIsim = item.isim_soyisim ? item.isim_soyisim.charAt(0) + "*** " + item.isim_soyisim.split(' ').slice(-1)[0].charAt(0) + "***" : "Kullanıcı";
 
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
+                        kanitSayisi++;
+                        const trKanit = document.createElement('tr');
+                        trKanit.innerHTML = `
+                            <td><b>${gizliIsim}</b><br><small style="color:#888;">${item.banka} (${gizliIban})</small></td>
+                            <td><b>${item.puan} P</b><br><span style="color:var(--accent);">${item.tl_tutar} TL</span></td>
+                            <td><span class="badge odendi">Ödendi</span></td>
+                        `;
+                        tbodyKanit.appendChild(trKanit);
+                    }
+
+                    // Admin tablosu
+                    const trAdmin = document.createElement('tr');
+                    trAdmin.innerHTML = `
                         <td><b>${item.isim_soyisim}</b><br><small style="color:#888;">${item.banka}</small><br><span style="color:var(--accent); font-size:11px;">${item.iban}</span></td>
                         <td><b>${item.puan} P</b><br><span style="color:#888;">${item.tl_tutar} TL</span></td>
                         <td><span class="badge ${item.durum === 'Ödendi' ? 'odendi' : 'bekliyor'}">${item.durum}</span></td>
                         <td>${item.durum !== 'Ödendi' ? `<button class="mini-btn" onclick="markAsPaid('${key}')">Öde</button>` : '✅'}</td>
                     `;
-                    tbody.appendChild(tr);
+                    tbodyAdmin.appendChild(trAdmin);
                 });
-            } else {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">Henüz çekim talebi bulunmuyor.</td></tr>`;
+            } 
+            
+            if (bekleyenSayisi === 0) {
+                tbodyAdmin.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">Bekleyen talep yok.</td></tr>`;
+            }
+            if (kanitSayisi === 0) {
+                tbodyKanit.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">Henüz tamamlanan ödeme yok.</td></tr>`;
             }
 
             document.getElementById('statBekleyen').innerText = bekleyenSayisi;
@@ -262,14 +311,9 @@
     </script>
 
     <script>
-        function toggleAdminLogin() {
-            const panel = document.getElementById('adminPanel');
-            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-        }
-
         function checkAdmin() {
             const pass = document.getElementById('adminPass').value;
-            if (pass === "123456") { // İstediğiniz şifreyi buraya yazabilirsiniz
+            if (pass === "123456") { // Yönetici şifreniz
                 document.getElementById('adminLoginBox').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
             } else {
@@ -283,7 +327,6 @@
             document.getElementById('adminPass').value = '';
         }
 
-        // Service Worker Kaydı (PWA Desteği)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').catch(() => {});
