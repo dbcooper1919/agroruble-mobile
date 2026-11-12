@@ -29,13 +29,16 @@
         .success { color: var(--accent); text-align: center; margin-top: 15px; font-size: 13px; background: var(--accent-glow); padding: 10px; border-radius: 8px; border: 1px solid rgba(0,255,204,0.2); }
         .error { color: #ff4d4d; text-align: center; margin-top: 15px; font-size: 13px; background: rgba(255,77,77,0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,77,77,0.2); }
         
+        /* Giriş Ekranı ve Sekmeler */
         .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
         .tab-btn { flex: 1; padding: 10px; background: #181822; border: 1px solid var(--border); color: var(--text-muted); border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; margin: 0; }
         .tab-btn.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
 
+        /* Kanıtlar Listesi */
         .proof-section { margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px; }
         .proof-title { color: var(--accent); font-size: 14px; margin-bottom: 10px; font-weight: bold; }
         
+        /* Admin Paneli */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .stat-card { background: #181822; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
         .stat-card span { display: block; font-size: 16px; font-weight: bold; color: var(--accent); margin-top: 4px; }
@@ -48,12 +51,18 @@
         .odendi { background: rgba(0,255,204,0.15); color: var(--accent); border: 1px solid rgba(0,255,204,0.3); }
         .mini-btn { padding: 6px 12px; background: var(--accent); color: #121218; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
         .logout-sm { background: #ff4d4d !important; color: #fff !important; padding: 6px 12px; font-size: 11px; margin: 0; width: auto; }
+        
+        /* Gizlilik Politikası Link Stili */
+        .footer-link { text-align: center; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px; }
+        .footer-link a { color: var(--text-muted); font-size: 12px; text-decoration: none; transition: color 0.2s; }
+        .footer-link a:hover { color: var(--accent); }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>💰 AgroRuble Ödül & Çekim Merkezi</h2>
 
+        <!-- Giriş Sekmeleri (Kullanıcı / Yönetici) -->
         <div class="auth-tabs" id="authTabs">
             <button class="tab-btn active" onclick="switchTab('user')">👤 Kullanıcı Girişi</button>
             <button class="tab-btn" onclick="switchTab('admin')">👑 Yönetici Girişi</button>
@@ -74,7 +83,7 @@
             </form>
         </div>
 
-        <!-- 2. KULLANICI ÇEKİM EKRANI -->
+        <!-- 2. KULLANICI ÇEKİM EKRANI (Giriş Yapınca Görünür) -->
         <div id="userDashboard" style="display:none;">
             <div class="user-box">
                 <div>
@@ -114,7 +123,7 @@
             </form>
         </div>
 
-        <!-- 3. YÖNETİCİ PANELİ -->
+        <!-- 3. YÖNETİCİ GİRİŞ & PANELİ -->
         <div id="adminSection" style="display:none;">
             <div id="adminLoginBox">
                 <label>Yönetici Şifresi:</label>
@@ -152,7 +161,7 @@
             </div>
         </div>
 
-        <!-- Ödeme Kanıtları -->
+        <!-- Herkesin Görebileceği Ödeme Kanıtları -->
         <div class="proof-section">
             <div class="proof-title">🏆 Son Ödeme Kanıtları (Tamamlananlar)</div>
             <div style="overflow-x:auto; max-height:150px;">
@@ -169,6 +178,11 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- Gizlilik Politikası Linki -->
+        <div class="footer-link">
+            <a href="gizlilik.html" target="_blank">📄 Privacy Policy (Gizlilik Politikası)</a>
         </div>
     </div>
 
@@ -196,21 +210,15 @@
         let activeUid = null;
         let userCurrentScore = 0;
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlUid = urlParams.get('uid');
-        if (urlUid) {
-            activeUid = urlUid;
-            loadUserData(urlUid);
-        }
-
+        // Sekme Değiştirme Fonksiyonu
         window.switchTab = function(type) {
             const tabs = document.querySelectorAll('.tab-btn');
             tabs.forEach(t => t.classList.remove('active'));
             
             if(type === 'user') {
                 event.target.classList.add('active');
-                document.getElementById('userLoginSection').style.display = (auth.currentUser || urlUid) ? 'none' : 'block';
-                document.getElementById('userDashboard').style.display = (auth.currentUser || urlUid) ? 'block' : 'none';
+                document.getElementById('userLoginSection').style.display = auth.currentUser ? 'none' : 'block';
+                document.getElementById('userDashboard').style.display = auth.currentUser ? 'block' : 'none';
                 document.getElementById('adminSection').style.display = 'none';
             } else {
                 event.target.classList.add('active');
@@ -220,6 +228,7 @@
             }
         }
 
+        // Kullanıcı Giriş İşlemi
         window.handleUserLogin = function(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
@@ -228,49 +237,48 @@
 
             signInWithEmailAndPassword(auth, email, pass)
                 .then((userCredential) => {
-                    generalMsg.innerHTML = `<div class='success'>Giriş başarılı!</div>`;
+                    generalMsg.innerHTML = `<div class='success'>Giriş başarılı! Yönlendiriliyorsunuz...</div>`;
                 })
                 .catch((error) => {
                     generalMsg.innerHTML = `<div class='error'>Giriş hatası: E-posta veya şifre yanlış.</div>`;
                 });
         }
 
+        // Oturum Durumunu Dinle
         onAuthStateChanged(auth, (user) => {
-            if (user && !urlUid) {
+            if (user) {
                 activeUid = user.uid;
-                loadUserData(user.uid);
-            } else if (!user && !urlUid) {
+                document.getElementById('userLoginSection').style.display = 'none';
+                document.getElementById('userDashboard').style.display = 'block';
+                
+                // Kullanıcı verilerini çek
+                const userRef = ref(db, 'users/' + activeUid);
+                get(userRef).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        userCurrentScore = data.score || 0;
+                        const fullName = (data.name || '') + ' ' + (data.surname || '');
+                        
+                        document.getElementById('userName').innerText = fullName.trim() || data.username || user.email;
+                        document.getElementById('puanDisplay').innerText = userCurrentScore.toLocaleString();
+                        document.getElementById('tlDisplay').innerText = ((userCurrentScore / 100) * 0.38).toFixed(2) + " TL";
+                        document.getElementById('isimSoyisim').value = fullName.trim();
+                    }
+                });
+            } else {
                 activeUid = null;
                 document.getElementById('userLoginSection').style.display = 'block';
                 document.getElementById('userDashboard').style.display = 'none';
             }
         });
 
-        function loadUserData(uid) {
-            document.getElementById('userLoginSection').style.display = 'none';
-            document.getElementById('userDashboard').style.display = 'block';
-            
-            const userRef = ref(db, 'users/' + uid);
-            get(userRef).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    userCurrentScore = data.score || 0;
-                    const fullName = (data.name || '') + ' ' + (data.surname || '');
-                    
-                    document.getElementById('userName').innerText = fullName.trim() || data.username || 'Kullanıcı';
-                    document.getElementById('puanDisplay').innerText = userCurrentScore.toLocaleString();
-                    document.getElementById('tlDisplay').innerText = ((userCurrentScore / 100) * 0.38).toFixed(2) + " TL";
-                    document.getElementById('isimSoyisim').value = fullName.trim();
-                }
-            });
-        }
-
         window.handleLogout = function() {
             signOut(auth).then(() => {
-                window.location.href = window.location.pathname;
+                document.getElementById('generalMsg').innerHTML = `<div class='success'>Çıkış yapıldı.</div>`;
             });
         }
 
+        // Çekim Talebi Oluşturma
         window.submitWithdraw = function(e) {
             e.preventDefault();
             const talepPuan = parseFloat(document.getElementById('talepPuan').value);
@@ -319,6 +327,7 @@
             });
         }
 
+        // Verileri Dinle (Kanıtlar ve Admin Paneli)
         const withdrawalsRef = ref(db, 'withdrawals');
         onValue(withdrawalsRef, (snapshot) => {
             const data = snapshot.val();
@@ -378,7 +387,7 @@
     <script>
         window.checkAdmin = function() {
             const pass = document.getElementById('adminPass').value;
-            if (pass === "123456") {
+            if (pass === "Kubi13579+-") { // Yönetici Şifreniz
                 document.getElementById('adminLoginBox').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
             } else {
