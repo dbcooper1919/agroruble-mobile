@@ -142,7 +142,7 @@
                 </div>
 
                 <p style="color:var(--accent); font-size:13px; margin: 15px 0 5px 0; font-weight:bold;">📋 Tüm Çekim Talepleri:</p>
-                <div style="overflow-x:auto; max-height:300px;">
+                <div style="overflow-x:auto; max-height:200px;">
                     <table>
                         <thead>
                             <tr>
@@ -157,6 +157,26 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Mağaza Siparişleri Takibi (Admin Paneli İçinde) -->
+                <p style="color:var(--accent); font-size:13px; margin: 20px 0 5px 0; font-weight:bold;">🎁 Mağaza Siparişleri Takibi:</p>
+                <div style="overflow-x:auto; max-height:200px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Kullanıcı E-posta</th>
+                                <th>Ürün</th>
+                                <th>Tutar</th>
+                                <th>Tarih</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shopOrdersList">
+                            <tr><td colspan="5" style="text-align:center; color:#888;">Yükleniyor...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
                 <button style="background:#ff4d4d; margin-top:20px; color:#fff;" onclick="logoutAdmin()">Yönetici Çıkış</button>
             </div>
         </div>
@@ -327,7 +347,7 @@
             });
         }
 
-        // Verileri Dinle (Kanıtlar ve Admin Paneli)
+        // Verileri Dinle (Çekim Talepleri, Kanıtlar ve Mağaza Siparişleri)
         const withdrawalsRef = ref(db, 'withdrawals');
         onValue(withdrawalsRef, (snapshot) => {
             const data = snapshot.val();
@@ -377,6 +397,34 @@
 
             document.getElementById('statBekleyen').innerText = bekleyenSayisi;
             document.getElementById('statOdenen').innerText = toplamOdenenTL.toFixed(2) + " TL";
+        });
+
+        // Mağaza Siparişlerini Dinle ve Admin Paneline Yaz
+        const ordersRef = ref(db, 'shop_orders');
+        onValue(ordersRef, (snapshot) => {
+            const data = snapshot.val();
+            const tbodyOrders = document.getElementById('shopOrdersList');
+            tbodyOrders.innerHTML = '';
+            
+            let count = 0;
+            if (data) {
+                Object.keys(data).reverse().forEach((key) => {
+                    const order = data[key];
+                    count++;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><b>${order.userEmail}</b></td>
+                        <td><span style="color:var(--accent);">${order.itemTitle}</span></td>
+                        <td><b>${order.itemPrice} P</b></td>
+                        <td><small style="color:#888;">${order.date}</small></td>
+                        <td><span class="badge bekliyor">${order.status || 'Bekliyor'}</span></td>
+                    `;
+                    tbodyOrders.appendChild(tr);
+                });
+            }
+            if (count === 0) {
+                tbodyOrders.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#888;">Henüz mağazadan ürün alan kimse yok.</td></tr>`;
+            }
         });
 
         window.markAsPaid = function(key) {
