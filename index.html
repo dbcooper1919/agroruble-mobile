@@ -17,7 +17,7 @@
             --border: #2a2a3d;
         }
         body { background: var(--bg-color); color: var(--text-main); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; box-sizing: border-box; }
-        .container { background: var(--card-bg); padding: 25px; border-radius: 16px; width: 100%; max-width: 500px; border: 1px solid var(--border); box-sizing: border-box; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        .container { background: var(--card-bg); padding: 25px; border-radius: 16px; width: 100%; max-width: 550px; border: 1px solid var(--border); box-sizing: border-box; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
         h2 { color: var(--accent); text-align: center; margin-bottom: 20px; font-size: 22px; letter-spacing: 0.5px; }
         .user-box { background: #162b32; padding: 15px; border-radius: 10px; border: 1px solid rgba(0,255,204,0.3); margin-bottom: 20px; font-size: 13px; line-height: 1.6; display: flex; justify-content: space-between; align-items: center; }
         .user-box b { color: var(--accent); }
@@ -52,7 +52,11 @@
         .mini-btn { padding: 6px 12px; background: var(--accent); color: #121218; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
         .logout-sm { background: #ff4d4d !important; color: #fff !important; padding: 6px 12px; font-size: 11px; margin: 0; width: auto; }
         
-        /* Gizlilik Politikası Link Stili */
+        /* Soru Kartları Tasarımı */
+        .question-card { background: #121218; border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+        .question-card h4 { color: var(--accent); margin: 0 0 8px 0; font-size: 13px; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+
         .footer-link { text-align: center; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px; }
         .footer-link a { color: var(--text-muted); font-size: 12px; text-decoration: none; transition: color 0.2s; }
         .footer-link a:hover { color: var(--accent); }
@@ -62,7 +66,7 @@
     <div class="container">
         <h2>💰 AgroRuble Ödül & Çekim Merkezi</h2>
 
-        <!-- Giriş Sekmeleri (Kullanıcı / Yönetici) -->
+        <!-- Giriş Sekmeleri -->
         <div class="auth-tabs" id="authTabs">
             <button class="tab-btn active" onclick="switchTab('user')">👤 Kullanıcı Girişi</button>
             <button class="tab-btn" onclick="switchTab('admin')">👑 Yönetici Girişi</button>
@@ -83,7 +87,7 @@
             </form>
         </div>
 
-        <!-- 2. KULLANICI ÇEKİM EKRANI (Giriş Yapınca Görünür) -->
+        <!-- 2. KULLANICI ÇEKİM EKRANI -->
         <div id="userDashboard" style="display:none;">
             <div class="user-box">
                 <div>
@@ -158,7 +162,6 @@
                     </table>
                 </div>
 
-                <!-- Mağaza Siparişleri Takibi (Admin Paneli İçinde) -->
                 <p style="color:var(--accent); font-size:13px; margin: 20px 0 5px 0; font-weight:bold;">🎁 Mağaza Siparişleri Takibi:</p>
                 <div style="overflow-x:auto; max-height:200px;">
                     <table>
@@ -177,7 +180,7 @@
                     </table>
                 </div>
 
-                <!-- YENİ: SORU VE İÇERİK YÖNETİM PANELİ -->
+                <!-- KOLAY FORM İLE SORU VE İÇERİK YÖNETİMİ -->
                 <div style="background:#181822; padding:15px; border-radius:10px; border:1px solid var(--border); margin-top:20px;">
                     <p style="color:var(--accent); font-size:14px; margin: 0 0 10px 0; font-weight:bold;">⚙️ Oyun Sorularını ve İçeriklerini Yönet</p>
                     <div id="adminMsgBox"></div>
@@ -192,11 +195,11 @@
                         <button style="margin-top:10px; background:var(--accent);" onclick="updateWordGameAdmin()">Kelimeyi Yayınla</button>
                     </div>
 
-                    <!-- Bilgi Yarışması (Riddle) Soru Yönetimi -->
+                    <!-- Bilgi Yarışması Kolay Form Yönetimi -->
                     <div style="margin-top:15px;">
                         <span style="font-size:12px; font-weight:bold; color:var(--text-muted);">🧠 Bilgi Yarışması Soru Yönetimi (15 Soru)</span>
                         <label>Kategori Seçin:</label>
-                        <select id="adminCategorySelect" onchange="loadCategoryForAdmin()">
+                        <select id="adminCategorySelect" onchange="loadCategoryForAdminForm()">
                             <option value="">-- Kategori Seçin --</option>
                             <option value="Matematik">Matematik</option>
                             <option value="Fizik">Fizik</option>
@@ -212,10 +215,12 @@
                             <option value="GenelKultur">Genel Kültür</option>
                         </select>
 
-                        <label style="margin-top:10px;">Sorular (15 Satırlık JSON Yapısı - Soru, Şıklar ve correctIndex):</label>
-                        <textarea id="adminRiddleJson" rows="10" style="width:100%; padding:10px; margin-top:5px; border-radius:8px; border:1px solid var(--border); background:#121218; color:#fff; font-family:monospace; font-size:11px; box-sizing:border-box; outline:none;" placeholder="Önce yukarıdan kategori seçin..."></textarea>
+                        <!-- 15 Sorunun Düz Form Alanları Buraya Otomatik Gelecek -->
+                        <div id="questionsFormContainer" style="margin-top:15px; max-height:450px; overflow-y:auto; padding-right:5px;">
+                            <p style="color:#888; font-size:12px; text-align:center;">Lütfen yukarıdan bir kategori seçin.</p>
+                        </div>
                         
-                        <button style="margin-top:10px; background:#00ffcc;" onclick="saveCategoryQuestionsAdmin()">Kategori Sorularını Kaydet ve Yayınla</button>
+                        <button style="margin-top:15px; background:#00ffcc;" onclick="saveCategoryQuestionsFromForm()">Tüm Soruları Kaydet ve Yayınla</button>
                     </div>
                 </div>
 
@@ -223,7 +228,7 @@
             </div>
         </div>
 
-        <!-- Herkesin Görebileceği Ödeme Kanıtları -->
+        <!-- Ödeme Kanıtları -->
         <div class="proof-section">
             <div class="proof-title">🏆 Son Ödeme Kanıtları (Tamamlananlar)</div>
             <div style="overflow-x:auto; max-height:150px;">
@@ -242,7 +247,6 @@
             </div>
         </div>
 
-        <!-- Gizlilik Politikası Linki -->
         <div class="footer-link">
             <a href="gizlilik.html" target="_blank">📄 Privacy Policy (Gizlilik Politikası)</a>
         </div>
@@ -272,7 +276,6 @@
         let activeUid = null;
         let userCurrentScore = 0;
 
-        // Sekme Değiştirme Fonksiyonu
         window.switchTab = function(type) {
             const tabs = document.querySelectorAll('.tab-btn');
             tabs.forEach(t => t.classList.remove('active'));
@@ -290,7 +293,6 @@
             }
         }
 
-        // Kullanıcı Giriş İşlemi
         window.handleUserLogin = function(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
@@ -298,22 +300,20 @@
             const generalMsg = document.getElementById('generalMsg');
 
             signInWithEmailAndPassword(auth, email, pass)
-                .then((userCredential) => {
+                .then(() => {
                     generalMsg.innerHTML = `<div class='success'>Giriş başarılı! Yönlendiriliyorsunuz...</div>`;
                 })
-                .catch((error) => {
+                .catch(() => {
                     generalMsg.innerHTML = `<div class='error'>Giriş hatası: E-posta veya şifre yanlış.</div>`;
                 });
         }
 
-        // Oturum Durumunu Dinle
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 activeUid = user.uid;
                 document.getElementById('userLoginSection').style.display = 'none';
                 document.getElementById('userDashboard').style.display = 'block';
                 
-                // Kullanıcı verilerini çek
                 const userRef = ref(db, 'users/' + activeUid);
                 get(userRef).then((snapshot) => {
                     if (snapshot.exists()) {
@@ -340,7 +340,6 @@
             });
         }
 
-        // Çekim Talebi Oluşturma
         window.submitWithdraw = function(e) {
             e.preventDefault();
             const talepPuan = parseFloat(document.getElementById('talepPuan').value);
@@ -389,7 +388,6 @@
             });
         }
 
-        // Verileri Dinle (Çekim Talepleri, Kanıtlar ve Mağaza Siparişleri)
         const withdrawalsRef = ref(db, 'withdrawals');
         onValue(withdrawalsRef, (snapshot) => {
             const data = snapshot.val();
@@ -441,7 +439,6 @@
             document.getElementById('statOdenen').innerText = toplamOdenenTL.toFixed(2) + " TL";
         });
 
-        // Mağaza Siparişlerini Dinle ve Admin Paneline Yaz
         const ordersRef = ref(db, 'shop_orders');
         onValue(ordersRef, (snapshot) => {
             const data = snapshot.val();
@@ -473,9 +470,6 @@
             update(ref(db, 'withdrawals/' + key), { durum: 'Ödendi' });
         }
 
-        // --- YENİ: ADMIN SORU YÖNETİMİ FONKSİYONLARI ---
-
-        // 1. Kelime Oyununu Güncelle
         window.updateWordGameAdmin = function() {
             const word = document.getElementById('adminWordInput').value.trim();
             const hint = document.getElementById('adminHintInput').value.trim();
@@ -496,44 +490,82 @@
             });
         };
 
-        // 2. Seçilen Kategorinin Sorularını Firebase'den Getir
-        window.loadCategoryForAdmin = function() {
+        // --- YENİ KOLAY FORM YÖNETİMİ FONKSİYONLARI ---
+
+        // Kategori seçilince 15 soruyu form alanları olarak ekrana doldurur
+        window.loadCategoryForAdminForm = function() {
             const cat = document.getElementById('adminCategorySelect').value;
-            const jsonArea = document.getElementById('adminRiddleJson');
+            const container = document.getElementById('questionsFormContainer');
             const msgDiv = document.getElementById('adminMsgBox');
 
             if (!cat) {
-                jsonArea.value = '';
+                container.innerHTML = `<p style="color:#888; font-size:12px; text-align:center;">Lütfen yukarıdan bir kategori seçin.</p>`;
                 return;
             }
 
             get(ref(db, 'questions/riddle/' + cat)).then((snapshot) => {
+                let questionsData = [];
                 if (snapshot.exists()) {
-                    jsonArea.value = JSON.stringify(snapshot.val(), null, 2);
-                    msgDiv.innerHTML = `<div class='success'>${cat} kategorisinin soruları yüklendi. Düzenleyebilirsiniz.</div>`;
-                } else {
-                    // Eğer henüz soru yoksa örnek 15'li JSON şablonu oluştur
-                    const defaultQuestions = [];
-                    for (let i = 1; i <= 15; i++) {
-                        defaultQuestions.push({
-                            id: cat.toLowerCase() + i,
-                            question: `${cat} Soru ${i} metnini buraya yazın`,
-                            options: ["Şık A", "Şık B", "Şık C", "Şık D"],
-                            correctIndex: 0
-                        });
-                    }
-                    jsonArea.value = JSON.stringify(defaultQuestions, null, 2);
-                    msgDiv.innerHTML = `<div class='success'>Bu kategoriye soru bulunamadı, 15 soruluk örnek şablon yüklendi.</div>`;
+                    questionsData = snapshot.val();
                 }
+
+                container.innerHTML = ''; // Temizle
+
+                // 15 soru için döngü oluşturup form elemanları basalım
+                for (let i = 0; i < 15; i++) {
+                    const q = questionsData[i] || {
+                        id: cat.toLowerCase() + (i + 1),
+                        question: "",
+                        options: ["", "", "", ""],
+                        correctIndex: 0
+                    };
+
+                    const card = document.createElement('div');
+                    card.className = 'question-card';
+                    card.innerHTML = `
+                        <h4>Soru ${i + 1}</h4>
+                        <label>Soru Metni:</label>
+                        <input type="text" id="q_text_${i}" value="${q.question.replace(/"/g, '&quot;')}" placeholder="Soruyu buraya yazın...">
+                        
+                        <div class="options-grid">
+                            <div>
+                                <label>Şık A:</label>
+                                <input type="text" id="q_opt_${i}_0" value="${(q.options[0] || '').replace(/"/g, '&quot;')}" placeholder="A şıkkı">
+                            </div>
+                            <div>
+                                <label>Şık B:</label>
+                                <input type="text" id="q_opt_${i}_1" value="${(q.options[1] || '').replace(/"/g, '&quot;')}" placeholder="B şıkkı">
+                            </div>
+                            <div>
+                                <label>Şık C:</label>
+                                <input type="text" id="q_opt_${i}_2" value="${(q.options[2] || '').replace(/"/g, '&quot;')}" placeholder="C şıkkı">
+                            </div>
+                            <div>
+                                <label>Şık D:</label>
+                                <input type="text" id="q_opt_${i}_3" value="${(q.options[3] || '').replace(/"/g, '&quot;')}" placeholder="D şıkkı">
+                            </div>
+                        </div>
+
+                        <label>Doğru Cevap Şıkkı:</label>
+                        <select id="q_correct_${i}">
+                            <option value="0" ${q.correctIndex === 0 ? 'selected' : ''}>A Şıkkı</option>
+                            <option value="1" ${q.correctIndex === 1 ? 'selected' : ''}>B Şıkkı</option>
+                            <option value="2" ${q.correctIndex === 2 ? 'selected' : ''}>C Şıkkı</option>
+                            <option value="3" ${q.correctIndex === 3 ? 'selected' : ''}>D Şıkkı</option>
+                        </select>
+                    `;
+                    container.appendChild(card);
+                }
+
+                msgDiv.innerHTML = `<div class='success'>${cat} kategorisinin 15 sorusu form olarak yüklendi. İstediğinizi düzenleyebilirsiniz.</div>`;
             }).catch((error) => {
-                msgDiv.innerHTML = `<div class='error'>Soru okuma hatası: ${error.message}</div>`;
+                msgDiv.innerHTML = `<div class='error'>Yükleme hatası: ${error.message}</div>`;
             });
         };
 
-        // 3. Düzenlenen Kategori Sorularını Firebase'e Kaydet
-        window.saveCategoryQuestionsAdmin = function() {
+        // Formdaki verileri otomatik toplayıp Firebase'e kaydeder
+        window.saveCategoryQuestionsFromForm = function() {
             const cat = document.getElementById('adminCategorySelect').value;
-            const jsonAreaVal = document.getElementById('adminRiddleJson').value;
             const msgDiv = document.getElementById('adminMsgBox');
 
             if (!cat) {
@@ -541,27 +573,36 @@
                 return;
             }
 
-            try {
-                const parsedData = JSON.parse(jsonAreaVal);
-                if (!Array.isArray(parsedData) || parsedData.length === 0) {
-                    throw new Error("Veri geçerli bir soru dizisi (Array) olmalıdır.");
-                }
+            const newQuestionsArray = [];
 
-                set(ref(db, 'questions/riddle/' + cat), parsedData).then(() => {
-                    msgDiv.innerHTML = `<div class='success'>${cat} kategorisi için sorular başarıyla Firebase'e kaydedildi! Uygulamada anında güncellendi.</div>`;
-                }).catch((error) => {
-                    msgDiv.innerHTML = `<div class='error'>Kayıt hatası: ${error.message}</div>`;
+            for (let i = 0; i < 15; i++) {
+                const qText = document.getElementById(`q_text_${i}`).value.trim();
+                const opt0 = document.getElementById(`q_opt_${i}_0`).value.trim();
+                const opt1 = document.getElementById(`q_opt_${i}_1`).value.trim();
+                const opt2 = document.getElementById(`q_opt_${i}_2`).value.trim();
+                const opt3 = document.getElementById(`q_opt_${i}_3`).value.trim();
+                const correctIdx = parseInt(document.getElementById(`q_correct_${i}`).value);
+
+                newQuestionsArray.push({
+                    id: cat.toLowerCase() + (i + 1),
+                    question: qText || `Soru ${i + 1}`,
+                    options: [opt0 || "Şık A", opt1 || "Şık B", opt2 || "Şık C", opt3 || "Şık D"],
+                    correctIndex: correctIdx
                 });
-            } catch (e) {
-                msgDiv.innerHTML = `<div class='error'>Geçersiz JSON formatı: ${e.message}</div>`;
             }
+
+            set(ref(db, 'questions/riddle/' + cat), newQuestionsArray).then(() => {
+                msgDiv.innerHTML = `<div class='success'>${cat} kategorisi başarıyla kaydedildi ve uygulamaya yansıdı!</div>`;
+            }).catch((error) => {
+                msgDiv.innerHTML = `<div class='error'>Kayıt hatası: ${error.message}</div>`;
+            });
         };
     </script>
 
     <script>
         window.checkAdmin = function() {
             const pass = document.getElementById('adminPass').value;
-            if (pass === "Kubi13579+-") { // Yönetici Şifreniz
+            if (pass === "Kubi13579+-") {
                 document.getElementById('adminLoginBox').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
             } else {
