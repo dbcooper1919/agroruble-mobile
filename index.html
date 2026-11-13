@@ -142,7 +142,7 @@
                 </div>
 
                 <p style="color:var(--accent); font-size:13px; margin: 15px 0 5px 0; font-weight:bold;">📋 Tüm Çekim Talepleri:</p>
-                <div style="overflow-x:auto; max-height:200px;">
+                <div style="overflow-x:auto; max-height:180px;">
                     <table>
                         <thead>
                             <tr>
@@ -160,7 +160,7 @@
 
                 <!-- Mağaza Siparişleri Takibi ve Onay Butonu -->
                 <p style="color:var(--accent); font-size:13px; margin: 20px 0 5px 0; font-weight:bold;">🎁 Mağaza Siparişleri Takibi:</p>
-                <div style="overflow-x:auto; max-height:200px;">
+                <div style="overflow-x:auto; max-height:180px;">
                     <table>
                         <thead>
                             <tr>
@@ -177,11 +177,28 @@
                     </table>
                 </div>
 
+                <!-- Kayıtlı Kullanıcılar ve UID Listesi -->
+                <p style="color:var(--accent); font-size:13px; margin: 20px 0 5px 0; font-weight:bold;">👥 Kayıtlı Kullanıcılar & UID Listesi:</p>
+                <div style="overflow-x:auto; max-height:180px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Kullanıcı / E-posta</th>
+                                <th>UID</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminUsersList">
+                            <tr><td colspan="3" style="text-align:center; color:#888;">Yükleniyor...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
                 <!-- Kullanıcıya Özel Bildirim / İpucu Gönderme Paneli -->
                 <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
                     <p style="color:var(--accent); font-size:13px; margin-bottom: 5px; font-weight:bold;">📤 Kullanıcıya Özel İpucu / Bildirim Gönder:</p>
                     <form onsubmit="sendNotification(event)">
-                        <label>Kullanıcı UID:</label>
+                        <label>Hedef Kullanıcı UID (Yukarıdan 'Seç' diyebilirsiniz):</label>
                         <input type="text" id="notifTargetUid" placeholder="Kullanıcının Firebase UID'si" required style="margin-bottom:8px;">
                         
                         <label>Mesaj / İpucu:</label>
@@ -452,6 +469,40 @@
                 tbodyOrders.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#888;">Bekleyen mağaza siparişi yok.</td></tr>`;
             }
         });
+
+        // Kayıtlı Kullanıcıları Listeleme (UID ile birlikte)
+        const usersRef = ref(db, 'users');
+        onValue(usersRef, (snapshot) => {
+            const data = snapshot.val();
+            const tbodyUsers = document.getElementById('adminUsersList');
+            tbodyUsers.innerHTML = '';
+            
+            let count = 0;
+            if (data) {
+                Object.keys(data).forEach((uid) => {
+                    const user = data[uid];
+                    count++;
+                    const displayName = user.username || (user.name ? `${user.name} ${user.surname || ''}` : user.email) || 'İsimsiz';
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><b>${displayName}</b><br><small style="color:#888;">${user.email || ''}</small></td>
+                        <td><code style="color:var(--accent); font-size:10px; background:#121218; padding:2px 4px; border-radius:4px;">${uid}</code></td>
+                        <td><button class="mini-btn" onclick="selectUserForNotif('${uid}')">Seç</button></td>
+                    `;
+                    tbodyUsers.appendChild(tr);
+                });
+            }
+            if (count === 0) {
+                tbodyUsers.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">Kayıtlı kullanıcı yok.</td></tr>`;
+            }
+        });
+
+        // Kullanıcının UID'sini otomatik olarak bildirim inputuna atma
+        window.selectUserForNotif = function(uid) {
+            document.getElementById('notifTargetUid').value = uid;
+            alert("Kullanıcı UID'si seçildi ve bildirim gönderme alanına eklendi!");
+        }
 
         window.markAsPaid = function(key) {
             update(ref(db, 'withdrawals/' + key), { durum: 'Ödendi' });
