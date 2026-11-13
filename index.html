@@ -17,7 +17,7 @@
             --border: #2a2a3d;
         }
         body { background: var(--bg-color); color: var(--text-main); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; box-sizing: border-box; }
-        .container { background: var(--card-bg); padding: 25px; border-radius: 16px; width: 100%; max-width: 550px; border: 1px solid var(--border); box-sizing: border-box; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        .container { background: var(--card-bg); padding: 25px; border-radius: 16px; width: 100%; max-width: 600px; border: 1px solid var(--border); box-sizing: border-box; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
         h2 { color: var(--accent); text-align: center; margin-bottom: 20px; font-size: 22px; letter-spacing: 0.5px; }
         .user-box { background: #162b32; padding: 15px; border-radius: 10px; border: 1px solid rgba(0,255,204,0.3); margin-bottom: 20px; font-size: 13px; line-height: 1.6; display: flex; justify-content: space-between; align-items: center; }
         .user-box b { color: var(--accent); }
@@ -29,16 +29,10 @@
         .success { color: var(--accent); text-align: center; margin-top: 15px; font-size: 13px; background: var(--accent-glow); padding: 10px; border-radius: 8px; border: 1px solid rgba(0,255,204,0.2); }
         .error { color: #ff4d4d; text-align: center; margin-top: 15px; font-size: 13px; background: rgba(255,77,77,0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,77,77,0.2); }
 
-        /* Giriş Ekranı ve Sekmeler */
         .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
         .tab-btn { flex: 1; padding: 10px; background: #181822; border: 1px solid var(--border); color: var(--text-muted); border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; margin: 0; }
         .tab-btn.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
 
-        /* Kanıtlar Listesi */
-        .proof-section { margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px; }
-        .proof-title { color: var(--accent); font-size: 14px; margin-bottom: 10px; font-weight: bold; }
-
-        /* Admin Paneli */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .stat-card { background: #181822; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
         .stat-card span { display: block; font-size: 16px; font-weight: bold; color: var(--accent); margin-top: 4px; }
@@ -49,13 +43,20 @@
         .badge { padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 10px; text-transform: uppercase; }
         .bekliyor { background: rgba(255,170,0,0.15); color: #ffaa00; border: 1px solid rgba(255,170,0,0.3); }
         .odendi { background: rgba(0,255,204,0.15); color: var(--accent); border: 1px solid rgba(0,255,204,0.3); }
-        .mini-btn { padding: 6px 12px; background: var(--accent); color: #121218; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
+        .mini-btn { padding: 6px 10px; background: var(--accent); color: #121218; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; margin-right: 4px; }
+        .danger-btn { background: #ff4d4d !important; color: #fff !important; }
         .logout-sm { background: #ff4d4d !important; color: #fff !important; padding: 6px 12px; font-size: 11px; margin: 0; width: auto; }
 
-        /* Soru Kartları Tasarımı */
         .question-card { background: #121218; border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-bottom: 12px; }
         .question-card h4 { color: var(--accent); margin: 0 0 8px 0; font-size: 13px; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+
+        /* Admin Chat Penceresi */
+        .chat-box-admin { background: #121218; border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-top: 15px; }
+        .chat-messages { max-height: 250px; overflow-y: auto; margin-bottom: 10px; padding-right: 5px; }
+        .admin-msg-bubble { padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; line-height: 1.4; border: 1px solid var(--border); }
+        .from-user { background: #1e2e3d; border-color: #2a4a5d; }
+        .from-admin { background: #1e3d2e; border-color: #00ffcc40; }
 
         .footer-link { text-align: center; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px; }
         .footer-link a { color: var(--text-muted); font-size: 12px; text-decoration: none; transition: color 0.2s; }
@@ -66,7 +67,6 @@
     <div class="container">
         <h2>💰 AgroRuble Ödül & Çekim Merkezi</h2>
 
-        <!-- Giriş Sekmeleri -->
         <div class="auth-tabs" id="authTabs">
             <button class="tab-btn active" onclick="switchTab('user')">👤 Kullanıcı Girişi</button>
             <button class="tab-btn" onclick="switchTab('admin')">👑 Yönetici Girişi</button>
@@ -79,10 +79,8 @@
             <form id="loginForm" onsubmit="handleUserLogin(event)">
                 <label>E-posta Adresi:</label>
                 <input type="email" id="loginEmail" placeholder="ornek@gmail.com" required>
-
                 <label>Şifre:</label>
                 <input type="password" id="loginPass" placeholder="******" required>
-
                 <button type="submit">Giriş Yap ve Puanımı Gör</button>
             </form>
         </div>
@@ -103,7 +101,6 @@
             <form id="withdrawForm" onsubmit="submitWithdraw(event)">
                 <label>İsim Soyisim:</label>
                 <input type="text" id="isimSoyisim" placeholder="Adınız Soyadınız" required>
-
                 <label>Banka / Cüzdan Adı:</label>
                 <select id="banka" required>
                     <option value="">Banka Seçiniz</option>
@@ -116,13 +113,10 @@
                     <option value="Enpara">Enpara</option>
                     <option value="Diğer">Diğer</option>
                 </select>
-
                 <label>IBAN veya Hesap Numarası:</label>
                 <input type="text" id="iban" placeholder="TR..." required>
-
                 <label>Çekilmek İstenen Puan (Min: 2600 P = 10 TL):</label>
                 <input type="number" id="talepPuan" placeholder="Örn: 3000" min="2600" step="any" required>
-
                 <button type="submit">Çekim Talebi Oluştur</button>
             </form>
         </div>
@@ -162,6 +156,36 @@
                     </table>
                 </div>
 
+                <!-- CANLI DESTEK TALEPLERİ YÖNETİMİ -->
+                <p style="color:var(--accent); font-size:13px; margin: 20px 0 5px 0; font-weight:bold;">💬 Canlı Destek Talepleri:</p>
+                <div style="overflow-x:auto; max-height:200px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Kullanıcı E-posta</th>
+                                <th>Son Mesaj</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="supportTicketsList">
+                            <tr><td colspan="3" style="text-align:center; color:#888;">Destek talebi yok.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- AKTİF SOHBET PENCERESİ -->
+                <div id="activeChatBox" style="display:none;" class="chat-box-admin">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span id="chatTitle" style="color:var(--accent); font-weight:bold; font-size:13px;">Sohbet</span>
+                        <button onclick="closeChat()" style="margin:0; padding:4px 8px; font-size:10px; width:auto; background:#ff4d4d; color:#fff;">Kapat</button>
+                    </div>
+                    <div id="chatMessagesList" class="chat-messages"></div>
+                    <div style="display:flex; gap:6px;">
+                        <input type="text" id="adminReplyInput" placeholder="Yanıt yazın..." style="margin:0;">
+                        <button onclick="sendAdminReply()" style="margin:0; width:90px; padding:8px;">Gönder</button>
+                    </div>
+                </div>
+
                 <p style="color:var(--accent); font-size:13px; margin: 20px 0 5px 0; font-weight:bold;">🎁 Mağaza Siparişleri Takibi:</p>
                 <div style="overflow-x:auto; max-height:200px;">
                     <table>
@@ -175,75 +199,12 @@
                             </tr>
                         </thead>
                         <tbody id="shopOrdersList">
-                            <tr><td colspan="5" style="text-align:center; color:#888;">Yükleniyor...</td></tr>
+                            <tr><td colspan="5" style="text-align:center; color:#888;">Henüz mağazadan ürün alan kimse yok.</td></tr>
                         </tbody>
                     </table>
                 </div>
 
-                <!-- KOLAY FORM İLE SORU VE İÇERİK YÖNETİMİ -->
-                <div style="background:#181822; padding:15px; border-radius:10px; border:1px solid var(--border); margin-top:20px;">
-                    <p style="color:var(--accent); font-size:14px; margin: 0 0 10px 0; font-weight:bold;">⚙️ Oyun Sorularını ve İçeriklerini Yönet</p>
-                    <div id="adminMsgBox"></div>
-
-                    <!-- Kelime Oyunu Yönetimi -->
-                    <div style="margin-top:10px; border-bottom:1px solid var(--border); padding-bottom:15px;">
-                        <span style="font-size:12px; font-weight:bold; color:var(--text-muted);">📝 Günlük Kelime Oyunu Güncelle</span>
-                        <label>Kelime (Boşluksuz):</label>
-                        <input type="text" id="adminWordInput" placeholder="Örn: saman">
-                        <label>İpucu / Atasözü:</label>
-                        <input type="text" id="adminHintInput" placeholder="Örn: Atasözü: Sakla samanı...">
-                        <button style="margin-top:10px; background:var(--accent);" onclick="updateWordGameAdmin()">Kelimeyi Yayınla</button>
-                    </div>
-
-                    <!-- Bilgi Yarışması Kolay Form Yönetimi -->
-                    <div style="margin-top:15px;">
-                        <span style="font-size:12px; font-weight:bold; color:var(--text-muted);">🧠 Bilgi Yarışması Soru Yönetimi (15 Soru)</span>
-                        <label>Kategori Seçin:</label>
-                        <select id="adminCategorySelect" onchange="loadCategoryForAdminForm()">
-                            <option value="">-- Kategori Seçin --</option>
-                            <option value="Matematik">Matematik</option>
-                            <option value="Fizik">Fizik</option>
-                            <option value="Kimya">Kimya</option>
-                            <option value="Biyoloji">Biyoloji</option>
-                            <option value="Tarih">Tarih</option>
-                            <option value="Cografya">Coğrafya</option>
-                            <option value="Edebiyat">Edebiyat</option>
-                            <option value="Felsefe">Felsefe</option>
-                            <option value="Ingilizce">İngilizce</option>
-                            <option value="Sanat">Sanat</option>
-                            <option value="Spor">Spor</option>
-                            <option value="GenelKultur">Genel Kültür</option>
-                        </select>
-
-                        <!-- 15 Sorunun Düz Form Alanları Buraya Otomatik Gelecek -->
-                        <div id="questionsFormContainer" style="margin-top:15px; max-height:450px; overflow-y:auto; padding-right:5px;">
-                            <p style="color:#888; font-size:12px; text-align:center;">Lütfen yukarıdan bir kategori seçin.</p>
-                        </div>
-
-                        <button style="margin-top:15px; background:#00ffcc;" onclick="saveCategoryQuestionsFromForm()">Tüm Soruları Kaydet ve Yayınla</button>
-                    </div>
-                </div>
-
                 <button style="background:#ff4d4d; margin-top:20px; color:#fff;" onclick="logoutAdmin()">Yönetici Çıkış</button>
-            </div>
-        </div>
-
-        <!-- Ödeme Kanıtları -->
-        <div class="proof-section">
-            <div class="proof-title">🏆 Son Ödeme Kanıtları (Tamamlananlar)</div>
-            <div style="overflow-x:auto; max-height:150px;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>İsim (Gizli IBAN)</th>
-                            <th>Tutar</th>
-                            <th>Durum</th>
-                        </tr>
-                    </thead>
-                    <tbody id="kanitListesi">
-                        <tr><td colspan="3" style="text-align:center; color:#888;">Yükleniyor...</td></tr>
-                    </tbody>
-                </table>
             </div>
         </div>
 
@@ -256,7 +217,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getDatabase, ref, get, update, push, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getDatabase, ref, get, update, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA-3zxKcxmWQjVWnvoucMr_t59Cr0ACNYI",
@@ -275,6 +236,8 @@
 
         let activeUid = null;
         let userCurrentScore = 0;
+        let currentActiveChatUid = null;
+        let chatUnsubscribe = null;
 
         window.switchTab = function(type) {
             const tabs = document.querySelectorAll('.tab-btn');
@@ -388,233 +351,107 @@
             });
         }
 
-        const withdrawalsRef = ref(db, 'withdrawals');
-        onValue(withdrawalsRef, (snapshot) => {
+        // CANLI DESTEK TALEPLERİNİ LİSTELEME
+        const supportRef = ref(db, 'support_tickets');
+        onValue(supportRef, (snapshot) => {
             const data = snapshot.val();
-            const tbodyAdmin = document.getElementById('talepListesi');
-            const tbodyKanit = document.getElementById('kanitListesi');
-
-            tbodyAdmin.innerHTML = '';
-            tbodyKanit.innerHTML = '';
-
-            let bekleyenSayisi = 0;
-            let toplamOdenenTL = 0;
-            let kanitSayisi = 0;
-
-            if (data) {
-                Object.keys(data).reverse().forEach((key) => {
-                    const item = data[key];
-                    if (item.durum === 'Bekliyor') bekleyenSayisi++;
-                    if (item.durum === 'Ödendi') {
-                        toplamOdenenTL += parseFloat(item.tl_tutar || 0);
-
-                        const gizliIban = item.iban ? item.iban.substring(0, 4) + " **** **** " + item.iban.slice(-4) : "TR** ****";
-                        const gizliIsim = item.isim_soyisim ? item.isim_soyisim.charAt(0) + "*** " + item.isim_soyisim.split(' ').slice(-1)[0].charAt(0) + "***" : "Kullanıcı";
-
-                        kanitSayisi++;
-                        const trKanit = document.createElement('tr');
-                        trKanit.innerHTML = `
-                            <td><b>${gizliIsim}</b><br><small style="color:#888;">${item.banka} (${gizliIban})</small></td>
-                            <td><b>${item.puan} P</b><br><span style="color:var(--accent);">${item.tl_tutar} TL</span></td>
-                            <td><span class="badge odendi">Ödendi</span></td>
-                        `;
-                        tbodyKanit.appendChild(trKanit);
-                    }
-
-                    const trAdmin = document.createElement('tr');
-                    trAdmin.innerHTML = `
-                        <td><b>${item.isim_soyisim}</b><br><small style="color:#888;">${item.banka}</small><br><span style="color:var(--accent); font-size:11px;">${item.iban}</span></td>
-                        <td><b>${item.puan} P</b><br><span style="color:#888;">${item.tl_tutar} TL</span></td>
-                        <td><span class="badge ${item.durum === 'Ödendi' ? 'odendi' : 'bekliyor'}">${item.durum}</span></td>
-                        <td>${item.durum !== 'Ödendi' ? `<button class="mini-btn" onclick="markAsPaid('${key}')">Öde</button>` : '✅'}</td>
-                    `;
-                    tbodyAdmin.appendChild(trAdmin);
-                });
-            } 
-
-            if (bekleyenSayisi === 0) tbodyAdmin.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">Bekleyen talep yok.</td></tr>`;
-            if (kanitSayisi === 0) tbodyKanit.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">Henüz ödeme yok.</td></tr>`;
-
-            document.getElementById('statBekleyen').innerText = bekleyenSayisi;
-            document.getElementById('statOdenen').innerText = toplamOdenenTL.toFixed(2) + " TL";
-        });
-
-        const ordersRef = ref(db, 'shop_orders');
-        onValue(ordersRef, (snapshot) => {
-            const data = snapshot.val();
-            const tbodyOrders = document.getElementById('shopOrdersList');
-            tbodyOrders.innerHTML = '';
+            const tbodySupport = document.getElementById('supportTicketsList');
+            tbodySupport.innerHTML = '';
 
             let count = 0;
             if (data) {
-                Object.keys(data).reverse().forEach((key) => {
-                    const order = data[key];
+                Object.keys(data).forEach((uid) => {
+                    const ticket = data[uid];
+                    const meta = ticket.meta || { email: 'Kullanıcı', lastMessage: 'Resimsiz/Mesajsız' };
                     count++;
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td><b>${order.userEmail}</b></td>
-                        <td><span style="color:var(--accent);">${order.itemTitle}</span></td>
-                        <td><b>${order.itemPrice} P</b></td>
-                        <td><small style="color:#888;">${order.date}</small></td>
-                        <td><span class="badge bekliyor">${order.status || 'Bekliyor'}</span></td>
+                        <td><b>${meta.email}</b></td>
+                        <td><small style="color:#b0b0c0;">${meta.lastMessage}</small></td>
+                        <td>
+                            <button class="mini-btn" onclick="openChat('${uid}', '${meta.email}')">Sohbeti Aç</button>
+                            <button class="mini-btn danger-btn" onclick="deleteTicket('${uid}')">Talebi Sil</button>
+                        </td>
                     `;
-                    tbodyOrders.appendChild(tr);
+                    tbodySupport.appendChild(tr);
                 });
             }
             if (count === 0) {
-                tbodyOrders.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#888;">Henüz mağazadan ürün alan kimse yok.</td></tr>`;
+                tbodySupport.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">Aktif destek talebi yok.</td></tr>`;
             }
         });
 
-        window.markAsPaid = function(key) {
-            update(ref(db, 'withdrawals/' + key), { durum: 'Ödendi' });
-        }
+        // ADMIN SOHBET AÇMA
+        window.openChat = function(uid, email) {
+            currentActiveChatUid = uid;
+            document.getElementById('activeChatBox').style.display = 'block';
+            document.getElementById('chatTitle').innerText = `Sohbet: ${email}`;
 
-        window.updateWordGameAdmin = function() {
-            const word = document.getElementById('adminWordInput').value.trim();
-            const hint = document.getElementById('adminHintInput').value.trim();
-            const msgDiv = document.getElementById('adminMsgBox');
+            if (chatUnsubscribe) chatUnsubscribe();
 
-            if (!word || !hint) {
-                msgDiv.innerHTML = `<div class='error'>Kelime ve ipucu boş bırakılamaz!</div>`;
-                return;
-            }
+            const messagesRef = ref(db, `support_tickets/${uid}/messages`);
+            chatUnsubscribe = onValue(messagesRef, (snapshot) => {
+                const msgData = snapshot.val();
+                const chatListDiv = document.getElementById('chatMessagesList');
+                chatListDiv.innerHTML = '';
 
-            set(ref(db, 'questions/wordgame'), {
-                word: word,
-                hint: hint
-            }).then(() => {
-                msgDiv.innerHTML = `<div class='success'>Kelime oyunu başarıyla güncellendi! Uygulamaya yansıdı.</div>`;
-            }).catch((error) => {
-                msgDiv.innerHTML = `<div class='error'>Hata: ${error.message}</div>`;
+                if (msgData) {
+                    Object.keys(msgData).forEach((key) => {
+                        const m = msgData[key];
+                        const div = document.createElement('div');
+                        div.className = `admin-msg-bubble ${m.sender === 'user' ? 'from-user' : 'from-admin'}`;
+                        div.innerHTML = `<b>${m.sender === 'user' ? 'Kullanıcı' : 'Destek'}:</b> ${m.message} <br><small style="color:#888; font-size:9px;">${m.date}</small>`;
+                        chatListDiv.appendChild(div);
+                    });
+                    chatListDiv.scrollTop = chatListDiv.scrollHeight;
+                } else {
+                    chatListDiv.innerHTML = `<div style="color:#888; text-align:center;">Mesaj bulunmuyor.</div>`;
+                }
             });
         };
 
-        // --- KOLAY FORM YÖNETİMİ FONKSİYONLARI ---
+        window.closeChat = function() {
+            document.getElementById('activeChatBox').style.display = 'none';
+            currentActiveChatUid = null;
+            if (chatUnsubscribe) chatUnsubscribe();
+        };
 
-        window.loadCategoryForAdminForm = function() {
-            try {
-                const cat = document.getElementById('adminCategorySelect').value;
-                const container = document.getElementById('questionsFormContainer');
-                const msgDiv = document.getElementById('adminMsgBox');
+        // ADMIN YANIT GÖNDERME
+        window.sendAdminReply = function() {
+            const inputEl = document.getElementById('adminReplyInput');
+            const text = inputEl.value.trim();
+            if (!text || !currentActiveChatUid) return;
 
-                if (!cat) {
-                    container.innerHTML = `<p style="color:#888; font-size:12px; text-align:center;">Lütfen yukarıdan bir kategori seçin.</p>`;
-                    return;
-                }
+            const messagesRef = ref(db, `support_tickets/${currentActiveChatUid}/messages`);
+            const newMsgRef = push(messagesRef);
 
-                get(ref(db, 'questions/riddle/' + cat)).then((snapshot) => {
-                    let questionsData = [];
-                    if (snapshot.exists()) {
-                        questionsData = snapshot.val();
-                    }
-
-                    container.innerHTML = '';
-
-                    for (let i = 0; i < 15; i++) {
-                        const q = questionsData[i] || {
-                            id: cat.toLowerCase() + (i + 1),
-                            question: "",
-                            options: ["", "", "", ""],
-                            correctIndex: 0
-                        };
-
-                        const card = document.createElement('div');
-                        card.className = 'question-card';
-                        card.innerHTML = `
-                            <h4>Soru ${i + 1}</h4>
-                            <label>Soru Metni:</label>
-                            <input type="text" id="q_text_${i}" value="${(q.question || '').replace(/"/g, '&quot;')}" placeholder="Soruyu buraya yazın...">
-                            
-                            <div class="options-grid">
-                                <div>
-                                    <label>Şık A:</label>
-                                    <input type="text" id="q_opt_${i}_0" value="${(q.options && q.options[0] ? q.options[0] : '').replace(/"/g, '&quot;')}" placeholder="A şıkkı">
-                                </div>
-                                <div>
-                                    <label>Şık B:</label>
-                                    <input type="text" id="q_opt_${i}_1" value="${(q.options && q.options[1] ? q.options[1] : '').replace(/"/g, '&quot;')}" placeholder="B şıkkı">
-                                </div>
-                                <div>
-                                    <label>Şık C:</label>
-                                    <input type="text" id="q_opt_${i}_2" value="${(q.options && q.options[2] ? q.options[2] : '').replace(/"/g, '&quot;')}" placeholder="C şıkkı">
-                                </div>
-                                <div>
-                                    <label>Şık D:</label>
-                                    <input type="text" id="q_opt_${i}_3" value="${(q.options && q.options[3] ? q.options[3] : '').replace(/"/g, '&quot;')}" placeholder="D şıkkı">
-                                </div>
-                            </div>
-
-                            <label>Doğru Cevap Şıkkı:</label>
-                            <select id="q_correct_${i}">
-                                <option value="0" ${q.correctIndex === 0 ? 'selected' : ''}>A Şıkkı</option>
-                                <option value="1" ${q.correctIndex === 1 ? 'selected' : ''}>B Şıkkı</option>
-                                <option value="2" ${q.correctIndex === 2 ? 'selected' : ''}>C Şıkkı</option>
-                                <option value="3" ${q.correctIndex === 3 ? 'selected' : ''}>D Şıkkı</option>
-                            </select>
-                        `;
-                        container.appendChild(card);
-                    }
-
-                    msgDiv.innerHTML = `<div class='success'>${cat} kategorisinin 15 sorusu yüklendi.</div>`;
-                }).catch((err) => {
-                    alert("Firebase Okuma Hatası: " + err.message);
+            set(newMsgRef, {
+                sender: 'admin',
+                message: text,
+                date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            }).then(() => {
+                inputEl.value = '';
+                // Meta güncelleme
+                update(ref(db, `support_tickets/${currentActiveChatUid}/meta`), {
+                    lastMessage: "Destek yanıtladı: " + text,
+                    updatedAt: Date.now()
                 });
-            } catch (e) {
-                alert("Form Yükleme Hatası: " + e.message);
+            });
+        };
+
+        // TALEBİ / SOHBETİ İKİ TARAFTAN SİLME
+        window.deleteTicket = function(uid) {
+            if (confirm("Bu destek talebini tamamen silmek istediğinize emin misiniz? (Kullanıcıda da silinecektir)")) {
+                remove(ref(db, `support_tickets/${uid}`)).then(() => {
+                    if (currentActiveChatUid === uid) {
+                        closeChat();
+                    }
+                    alert("Destek talebi silindi.");
+                });
             }
         };
 
-        window.saveCategoryQuestionsFromForm = function() {
-            try {
-                const cat = document.getElementById('adminCategorySelect').value;
-                const msgDiv = document.getElementById('adminMsgBox');
-
-                if (!cat) {
-                    msgDiv.innerHTML = `<div class='error'>Lütfen bir kategori seçin!</div>`;
-                    alert("Lütfen önce kategori seçin!");
-                    return;
-                }
-
-                const newQuestionsArray = [];
-
-                for (let i = 0; i < 15; i++) {
-                    const textEl = document.getElementById(`q_text_${i}`);
-                    const opt0El = document.getElementById(`q_opt_${i}_0`);
-                    const opt1El = document.getElementById(`q_opt_${i}_1`);
-                    const opt2El = document.getElementById(`q_opt_${i}_2`);
-                    const opt3El = document.getElementById(`q_opt_${i}_3`);
-                    const correctEl = document.getElementById(`q_correct_${i}`);
-
-                    const qText = textEl ? textEl.value.trim() : "";
-                    const opt0 = opt0El ? opt0El.value.trim() : "";
-                    const opt1 = opt1El ? opt1El.value.trim() : "";
-                    const opt2 = opt2El ? opt2El.value.trim() : "";
-                    const opt3 = opt3El ? opt3El.value.trim() : "";
-                    const correctIdx = correctEl ? parseInt(correctEl.value) : 0;
-
-                    newQuestionsArray.push({
-                        id: cat.toLowerCase() + (i + 1),
-                        question: qText || `Soru ${i + 1}`,
-                        options: [opt0 || "Şık A", opt1 || "Şık B", opt2 || "Şık C", opt3 || "Şık D"],
-                        correctIndex: correctIdx
-                    });
-                }
-
-                set(ref(db, 'questions/riddle/' + cat), newQuestionsArray).then(() => {
-                    msgDiv.innerHTML = `<div class='success'>${cat} kategorisi başarıyla kaydedildi!</div>`;
-                    alert("Başarıyla kaydedildi!");
-                }).catch((error) => {
-                    msgDiv.innerHTML = `<div class='error'>Kayıt hatası: ${error.message}</div>`;
-                    alert("Kayıt hatası: " + error.message);
-                });
-            } catch (e) {
-                alert("Kod Çalışma Hatası: " + e.message);
-            }
-        };
-    </script>
-
-    <script>
         window.checkAdmin = function() {
             const pass = document.getElementById('adminPass').value;
             if (pass === "Kubi13579+-") {
@@ -629,12 +466,7 @@
             document.getElementById('adminLoginBox').style.display = 'block';
             document.getElementById('adminContent').style.display = 'none';
             document.getElementById('adminPass').value = '';
-        }
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(() => {});
-            });
+            closeChat();
         }
     </script>
 </body>
