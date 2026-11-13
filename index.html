@@ -28,7 +28,7 @@
         button:hover { opacity: 0.9; }
         .success { color: var(--accent); text-align: center; margin-top: 15px; font-size: 13px; background: var(--accent-glow); padding: 10px; border-radius: 8px; border: 1px solid rgba(0,255,204,0.2); }
         .error { color: #ff4d4d; text-align: center; margin-top: 15px; font-size: 13px; background: rgba(255,77,77,0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,77,77,0.2); }
-        
+
         /* Giriş Ekranı ve Sekmeler */
         .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
         .tab-btn { flex: 1; padding: 10px; background: #181822; border: 1px solid var(--border); color: var(--text-muted); border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; margin: 0; }
@@ -37,12 +37,12 @@
         /* Kanıtlar Listesi */
         .proof-section { margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px; }
         .proof-title { color: var(--accent); font-size: 14px; margin-bottom: 10px; font-weight: bold; }
-        
+
         /* Admin Paneli */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .stat-card { background: #181822; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
         .stat-card span { display: block; font-size: 16px; font-weight: bold; color: var(--accent); margin-top: 4px; }
-        
+
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
         th, td { padding: 10px 8px; border-bottom: 1px solid var(--border); text-align: left; }
         th { color: var(--accent); background: #181822; font-weight: 600; }
@@ -51,7 +51,7 @@
         .odendi { background: rgba(0,255,204,0.15); color: var(--accent); border: 1px solid rgba(0,255,204,0.3); }
         .mini-btn { padding: 6px 12px; background: var(--accent); color: #121218; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
         .logout-sm { background: #ff4d4d !important; color: #fff !important; padding: 6px 12px; font-size: 11px; margin: 0; width: auto; }
-        
+
         /* Soru Kartları Tasarımı */
         .question-card { background: #121218; border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-bottom: 12px; }
         .question-card h4 { color: var(--accent); margin: 0 0 8px 0; font-size: 13px; }
@@ -99,7 +99,7 @@
             </div>
 
             <div id="msgBox"></div>
-            
+
             <form id="withdrawForm" onsubmit="submitWithdraw(event)">
                 <label>İsim Soyisim:</label>
                 <input type="text" id="isimSoyisim" placeholder="Adınız Soyadınız" required>
@@ -122,7 +122,7 @@
 
                 <label>Çekilmek İstenen Puan (Min: 2600 P = 10 TL):</label>
                 <input type="number" id="talepPuan" placeholder="Örn: 3000" min="2600" step="any" required>
-                
+
                 <button type="submit">Çekim Talebi Oluştur</button>
             </form>
         </div>
@@ -134,7 +134,7 @@
                 <input type="password" id="adminPass" placeholder="Admin şifresi">
                 <button onclick="checkAdmin()">Yönetici Girişi Yap</button>
             </div>
-            
+
             <div id="adminContent" style="display:none; margin-top: 15px;">
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -219,7 +219,7 @@
                         <div id="questionsFormContainer" style="margin-top:15px; max-height:450px; overflow-y:auto; padding-right:5px;">
                             <p style="color:#888; font-size:12px; text-align:center;">Lütfen yukarıdan bir kategori seçin.</p>
                         </div>
-                        
+
                         <button style="margin-top:15px; background:#00ffcc;" onclick="saveCategoryQuestionsFromForm()">Tüm Soruları Kaydet ve Yayınla</button>
                     </div>
                 </div>
@@ -279,7 +279,7 @@
         window.switchTab = function(type) {
             const tabs = document.querySelectorAll('.tab-btn');
             tabs.forEach(t => t.classList.remove('active'));
-            
+
             if(type === 'user') {
                 event.target.classList.add('active');
                 document.getElementById('userLoginSection').style.display = auth.currentUser ? 'none' : 'block';
@@ -313,14 +313,14 @@
                 activeUid = user.uid;
                 document.getElementById('userLoginSection').style.display = 'none';
                 document.getElementById('userDashboard').style.display = 'block';
-                
+
                 const userRef = ref(db, 'users/' + activeUid);
                 get(userRef).then((snapshot) => {
                     if (snapshot.exists()) {
                         const data = snapshot.val();
                         userCurrentScore = data.score || 0;
                         const fullName = (data.name || '') + ' ' + (data.surname || '');
-                        
+
                         document.getElementById('userName').innerText = fullName.trim() || data.username || user.email;
                         document.getElementById('puanDisplay').innerText = userCurrentScore.toLocaleString();
                         document.getElementById('tlDisplay').innerText = ((userCurrentScore / 100) * 0.38).toFixed(2) + " TL";
@@ -393,10 +393,10 @@
             const data = snapshot.val();
             const tbodyAdmin = document.getElementById('talepListesi');
             const tbodyKanit = document.getElementById('kanitListesi');
-            
+
             tbodyAdmin.innerHTML = '';
             tbodyKanit.innerHTML = '';
-            
+
             let bekleyenSayisi = 0;
             let toplamOdenenTL = 0;
             let kanitSayisi = 0;
@@ -407,7 +407,7 @@
                     if (item.durum === 'Bekliyor') bekleyenSayisi++;
                     if (item.durum === 'Ödendi') {
                         toplamOdenenTL += parseFloat(item.tl_tutar || 0);
-                        
+
                         const gizliIban = item.iban ? item.iban.substring(0, 4) + " **** **** " + item.iban.slice(-4) : "TR** ****";
                         const gizliIsim = item.isim_soyisim ? item.isim_soyisim.charAt(0) + "*** " + item.isim_soyisim.split(' ').slice(-1)[0].charAt(0) + "***" : "Kullanıcı";
 
@@ -431,7 +431,7 @@
                     tbodyAdmin.appendChild(trAdmin);
                 });
             } 
-            
+
             if (bekleyenSayisi === 0) tbodyAdmin.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">Bekleyen talep yok.</td></tr>`;
             if (kanitSayisi === 0) tbodyKanit.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">Henüz ödeme yok.</td></tr>`;
 
@@ -444,7 +444,7 @@
             const data = snapshot.val();
             const tbodyOrders = document.getElementById('shopOrdersList');
             tbodyOrders.innerHTML = '';
-            
+
             let count = 0;
             if (data) {
                 Object.keys(data).reverse().forEach((key) => {
@@ -490,112 +490,127 @@
             });
         };
 
-        // --- YENİ KOLAY FORM YÖNETİMİ FONKSİYONLARI ---
+        // --- KOLAY FORM YÖNETİMİ FONKSİYONLARI ---
 
-        // Kategori seçilince 15 soruyu form alanları olarak ekrana doldurur
         window.loadCategoryForAdminForm = function() {
-            const cat = document.getElementById('adminCategorySelect').value;
-            const container = document.getElementById('questionsFormContainer');
-            const msgDiv = document.getElementById('adminMsgBox');
+            try {
+                const cat = document.getElementById('adminCategorySelect').value;
+                const container = document.getElementById('questionsFormContainer');
+                const msgDiv = document.getElementById('adminMsgBox');
 
-            if (!cat) {
-                container.innerHTML = `<p style="color:#888; font-size:12px; text-align:center;">Lütfen yukarıdan bir kategori seçin.</p>`;
-                return;
+                if (!cat) {
+                    container.innerHTML = `<p style="color:#888; font-size:12px; text-align:center;">Lütfen yukarıdan bir kategori seçin.</p>`;
+                    return;
+                }
+
+                get(ref(db, 'questions/riddle/' + cat)).then((snapshot) => {
+                    let questionsData = [];
+                    if (snapshot.exists()) {
+                        questionsData = snapshot.val();
+                    }
+
+                    container.innerHTML = '';
+
+                    for (let i = 0; i < 15; i++) {
+                        const q = questionsData[i] || {
+                            id: cat.toLowerCase() + (i + 1),
+                            question: "",
+                            options: ["", "", "", ""],
+                            correctIndex: 0
+                        };
+
+                        const card = document.createElement('div');
+                        card.className = 'question-card';
+                        card.innerHTML = `
+                            <h4>Soru ${i + 1}</h4>
+                            <label>Soru Metni:</label>
+                            <input type="text" id="q_text_${i}" value="${(q.question || '').replace(/"/g, '&quot;')}" placeholder="Soruyu buraya yazın...">
+                            
+                            <div class="options-grid">
+                                <div>
+                                    <label>Şık A:</label>
+                                    <input type="text" id="q_opt_${i}_0" value="${(q.options && q.options[0] ? q.options[0] : '').replace(/"/g, '&quot;')}" placeholder="A şıkkı">
+                                </div>
+                                <div>
+                                    <label>Şık B:</label>
+                                    <input type="text" id="q_opt_${i}_1" value="${(q.options && q.options[1] ? q.options[1] : '').replace(/"/g, '&quot;')}" placeholder="B şıkkı">
+                                </div>
+                                <div>
+                                    <label>Şık C:</label>
+                                    <input type="text" id="q_opt_${i}_2" value="${(q.options && q.options[2] ? q.options[2] : '').replace(/"/g, '&quot;')}" placeholder="C şıkkı">
+                                </div>
+                                <div>
+                                    <label>Şık D:</label>
+                                    <input type="text" id="q_opt_${i}_3" value="${(q.options && q.options[3] ? q.options[3] : '').replace(/"/g, '&quot;')}" placeholder="D şıkkı">
+                                </div>
+                            </div>
+
+                            <label>Doğru Cevap Şıkkı:</label>
+                            <select id="q_correct_${i}">
+                                <option value="0" ${q.correctIndex === 0 ? 'selected' : ''}>A Şıkkı</option>
+                                <option value="1" ${q.correctIndex === 1 ? 'selected' : ''}>B Şıkkı</option>
+                                <option value="2" ${q.correctIndex === 2 ? 'selected' : ''}>C Şıkkı</option>
+                                <option value="3" ${q.correctIndex === 3 ? 'selected' : ''}>D Şıkkı</option>
+                            </select>
+                        `;
+                        container.appendChild(card);
+                    }
+
+                    msgDiv.innerHTML = `<div class='success'>${cat} kategorisinin 15 sorusu yüklendi.</div>`;
+                }).catch((err) => {
+                    alert("Firebase Okuma Hatası: " + err.message);
+                });
+            } catch (e) {
+                alert("Form Yükleme Hatası: " + e.message);
             }
-
-            get(ref(db, 'questions/riddle/' + cat)).then((snapshot) => {
-                let questionsData = [];
-                if (snapshot.exists()) {
-                    questionsData = snapshot.val();
-                }
-
-                container.innerHTML = ''; // Temizle
-
-                // 15 soru için döngü oluşturup form elemanları basalım
-                for (let i = 0; i < 15; i++) {
-                    const q = questionsData[i] || {
-                        id: cat.toLowerCase() + (i + 1),
-                        question: "",
-                        options: ["", "", "", ""],
-                        correctIndex: 0
-                    };
-
-                    const card = document.createElement('div');
-                    card.className = 'question-card';
-                    card.innerHTML = `
-                        <h4>Soru ${i + 1}</h4>
-                        <label>Soru Metni:</label>
-                        <input type="text" id="q_text_${i}" value="${q.question.replace(/"/g, '&quot;')}" placeholder="Soruyu buraya yazın...">
-                        
-                        <div class="options-grid">
-                            <div>
-                                <label>Şık A:</label>
-                                <input type="text" id="q_opt_${i}_0" value="${(q.options[0] || '').replace(/"/g, '&quot;')}" placeholder="A şıkkı">
-                            </div>
-                            <div>
-                                <label>Şık B:</label>
-                                <input type="text" id="q_opt_${i}_1" value="${(q.options[1] || '').replace(/"/g, '&quot;')}" placeholder="B şıkkı">
-                            </div>
-                            <div>
-                                <label>Şık C:</label>
-                                <input type="text" id="q_opt_${i}_2" value="${(q.options[2] || '').replace(/"/g, '&quot;')}" placeholder="C şıkkı">
-                            </div>
-                            <div>
-                                <label>Şık D:</label>
-                                <input type="text" id="q_opt_${i}_3" value="${(q.options[3] || '').replace(/"/g, '&quot;')}" placeholder="D şıkkı">
-                            </div>
-                        </div>
-
-                        <label>Doğru Cevap Şıkkı:</label>
-                        <select id="q_correct_${i}">
-                            <option value="0" ${q.correctIndex === 0 ? 'selected' : ''}>A Şıkkı</option>
-                            <option value="1" ${q.correctIndex === 1 ? 'selected' : ''}>B Şıkkı</option>
-                            <option value="2" ${q.correctIndex === 2 ? 'selected' : ''}>C Şıkkı</option>
-                            <option value="3" ${q.correctIndex === 3 ? 'selected' : ''}>D Şıkkı</option>
-                        </select>
-                    `;
-                    container.appendChild(card);
-                }
-
-                msgDiv.innerHTML = `<div class='success'>${cat} kategorisinin 15 sorusu form olarak yüklendi. İstediğinizi düzenleyebilirsiniz.</div>`;
-            }).catch((error) => {
-                msgDiv.innerHTML = `<div class='error'>Yükleme hatası: ${error.message}</div>`;
-            });
         };
 
-        // Formdaki verileri otomatik toplayıp Firebase'e kaydeder
         window.saveCategoryQuestionsFromForm = function() {
-            const cat = document.getElementById('adminCategorySelect').value;
-            const msgDiv = document.getElementById('adminMsgBox');
+            try {
+                const cat = document.getElementById('adminCategorySelect').value;
+                const msgDiv = document.getElementById('adminMsgBox');
 
-            if (!cat) {
-                msgDiv.innerHTML = `<div class='error'>Lütfen bir kategori seçin!</div>`;
-                return;
-            }
+                if (!cat) {
+                    msgDiv.innerHTML = `<div class='error'>Lütfen bir kategori seçin!</div>`;
+                    alert("Lütfen önce kategori seçin!");
+                    return;
+                }
 
-            const newQuestionsArray = [];
+                const newQuestionsArray = [];
 
-            for (let i = 0; i < 15; i++) {
-                const qText = document.getElementById(`q_text_${i}`).value.trim();
-                const opt0 = document.getElementById(`q_opt_${i}_0`).value.trim();
-                const opt1 = document.getElementById(`q_opt_${i}_1`).value.trim();
-                const opt2 = document.getElementById(`q_opt_${i}_2`).value.trim();
-                const opt3 = document.getElementById(`q_opt_${i}_3`).value.trim();
-                const correctIdx = parseInt(document.getElementById(`q_correct_${i}`).value);
+                for (let i = 0; i < 15; i++) {
+                    const textEl = document.getElementById(`q_text_${i}`);
+                    const opt0El = document.getElementById(`q_opt_${i}_0`);
+                    const opt1El = document.getElementById(`q_opt_${i}_1`);
+                    const opt2El = document.getElementById(`q_opt_${i}_2`);
+                    const opt3El = document.getElementById(`q_opt_${i}_3`);
+                    const correctEl = document.getElementById(`q_correct_${i}`);
 
-                newQuestionsArray.push({
-                    id: cat.toLowerCase() + (i + 1),
-                    question: qText || `Soru ${i + 1}`,
-                    options: [opt0 || "Şık A", opt1 || "Şık B", opt2 || "Şık C", opt3 || "Şık D"],
-                    correctIndex: correctIdx
+                    const qText = textEl ? textEl.value.trim() : "";
+                    const opt0 = opt0El ? opt0El.value.trim() : "";
+                    const opt1 = opt1El ? opt1El.value.trim() : "";
+                    const opt2 = opt2El ? opt2El.value.trim() : "";
+                    const opt3 = opt3El ? opt3El.value.trim() : "";
+                    const correctIdx = correctEl ? parseInt(correctEl.value) : 0;
+
+                    newQuestionsArray.push({
+                        id: cat.toLowerCase() + (i + 1),
+                        question: qText || `Soru ${i + 1}`,
+                        options: [opt0 || "Şık A", opt1 || "Şık B", opt2 || "Şık C", opt3 || "Şık D"],
+                        correctIndex: correctIdx
+                    });
+                }
+
+                set(ref(db, 'questions/riddle/' + cat), newQuestionsArray).then(() => {
+                    msgDiv.innerHTML = `<div class='success'>${cat} kategorisi başarıyla kaydedildi!</div>`;
+                    alert("Başarıyla kaydedildi!");
+                }).catch((error) => {
+                    msgDiv.innerHTML = `<div class='error'>Kayıt hatası: ${error.message}</div>`;
+                    alert("Kayıt hatası: " + error.message);
                 });
+            } catch (e) {
+                alert("Kod Çalışma Hatası: " + e.message);
             }
-
-            set(ref(db, 'questions/riddle/' + cat), newQuestionsArray).then(() => {
-                msgDiv.innerHTML = `<div class='success'>${cat} kategorisi başarıyla kaydedildi ve uygulamaya yansıdı!</div>`;
-            }).catch((error) => {
-                msgDiv.innerHTML = `<div class='error'>Kayıt hatası: ${error.message}</div>`;
-            });
         };
     </script>
 
