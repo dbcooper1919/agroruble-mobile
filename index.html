@@ -22,8 +22,8 @@
         .user-box { background: #162b32; padding: 15px; border-radius: 10px; border: 1px solid rgba(0,255,204,0.3); margin-bottom: 20px; font-size: 13px; line-height: 1.6; display: flex; justify-content: space-between; align-items: center; }
         .user-box b { color: var(--accent); }
         label { color: var(--text-muted); font-size: 12px; display: block; margin-top: 10px; font-weight: 600; }
-        input, select { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid var(--border); background: #181822; color: #fff; box-sizing: border-box; font-size: 14px; outline: none; transition: border 0.3s; }
-        input:focus, select:focus { border-color: var(--accent); }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid var(--border); background: #181822; color: #fff; box-sizing: border-box; font-size: 14px; outline: none; transition: border 0.3s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); }
         button { width: 100%; padding: 14px; background: var(--accent); color: #121218; font-weight: bold; cursor: pointer; margin-top: 20px; border: none; border-radius: 8px; font-size: 15px; transition: opacity 0.2s; }
         button:hover { opacity: 0.9; }
         .success { color: var(--accent); text-align: center; margin-top: 15px; font-size: 13px; background: var(--accent-glow); padding: 10px; border-radius: 8px; border: 1px solid rgba(0,255,204,0.2); }
@@ -142,7 +142,7 @@
                 </div>
 
                 <p style="color:var(--accent); font-size:13px; margin: 15px 0 5px 0; font-weight:bold;">📋 Tüm Çekim Talepleri:</p>
-                <div style="overflow-x:auto; max-height:180px;">
+                <div style="overflow-x:auto; max-height:200px;">
                     <table>
                         <thead>
                             <tr>
@@ -158,17 +158,17 @@
                     </table>
                 </div>
 
-                <!-- Mağaza Siparişleri Takibi ve Onay Butonu -->
+                <!-- Mağaza Siparişleri Takibi (Admin Paneli İçinde) -->
                 <p style="color:var(--accent); font-size:13px; margin: 20px 0 5px 0; font-weight:bold;">🎁 Mağaza Siparişleri Takibi:</p>
-                <div style="overflow-x:auto; max-height:180px;">
+                <div style="overflow-x:auto; max-height:200px;">
                     <table>
                         <thead>
                             <tr>
                                 <th>Kullanıcı E-posta</th>
                                 <th>Ürün</th>
                                 <th>Tutar</th>
+                                <th>Tarih</th>
                                 <th>Durum</th>
-                                <th>İşlem</th>
                             </tr>
                         </thead>
                         <tbody id="shopOrdersList">
@@ -177,51 +177,45 @@
                     </table>
                 </div>
 
-                <!-- Kayıtlı Kullanıcılar ve UID Listesi -->
-                <p style="color:var(--accent); font-size:13px; margin: 20px 0 5px 0; font-weight:bold;">👥 Kayıtlı Kullanıcılar & UID Listesi:</p>
-                <div style="overflow-x:auto; max-height:180px;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Kullanıcı / E-posta</th>
-                                <th>UID</th>
-                                <th>İşlem</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminUsersList">
-                            <tr><td colspan="3" style="text-align:center; color:#888;">Yükleniyor...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+                <!-- YENİ: SORU VE İÇERİK YÖNETİM PANELİ -->
+                <div style="background:#181822; padding:15px; border-radius:10px; border:1px solid var(--border); margin-top:20px;">
+                    <p style="color:var(--accent); font-size:14px; margin: 0 0 10px 0; font-weight:bold;">⚙️ Oyun Sorularını ve İçeriklerini Yönet</p>
+                    <div id="adminMsgBox"></div>
 
-                <!-- Kullanıcıya Özel Bildirim / İpucu Gönderme Paneli -->
-                <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
-                    <p style="color:var(--accent); font-size:13px; margin-bottom: 5px; font-weight:bold;">📤 Kullanıcıya Özel İpucu / Bildirim Gönder:</p>
-                    <form onsubmit="sendNotification(event)">
-                        <label>Hedef Kullanıcı UID (Yukarıdan 'Seç' diyebilirsiniz):</label>
-                        <input type="text" id="notifTargetUid" placeholder="Kullanıcının Firebase UID'si" required style="margin-bottom:8px;">
+                    <!-- Kelime Oyunu Yönetimi -->
+                    <div style="margin-top:10px; border-bottom:1px solid var(--border); padding-bottom:15px;">
+                        <span style="font-size:12px; font-weight:bold; color:var(--text-muted);">📝 Günlük Kelime Oyunu Güncelle</span>
+                        <label>Kelime (Boşluksuz):</label>
+                        <input type="text" id="adminWordInput" placeholder="Örn: saman">
+                        <label>İpucu / Atasözü:</label>
+                        <input type="text" id="adminHintInput" placeholder="Örn: Atasözü: Sakla samanı...">
+                        <button style="margin-top:10px; background:var(--accent);" onclick="updateWordGameAdmin()">Kelimeyi Yayınla</button>
+                    </div>
+
+                    <!-- Bilgi Yarışması (Riddle) Soru Yönetimi -->
+                    <div style="margin-top:15px;">
+                        <span style="font-size:12px; font-weight:bold; color:var(--text-muted);">🧠 Bilgi Yarışması Soru Yönetimi (15 Soru)</span>
+                        <label>Kategori Seçin:</label>
+                        <select id="adminCategorySelect" onchange="loadCategoryForAdmin()">
+                            <option value="">-- Kategori Seçin --</option>
+                            <option value="Matematik">Matematik</option>
+                            <option value="Fizik">Fizik</option>
+                            <option value="Kimya">Kimya</option>
+                            <option value="Biyoloji">Biyoloji</option>
+                            <option value="Tarih">Tarih</option>
+                            <option value="Cografya">Coğrafya</option>
+                            <option value="Edebiyat">Edebiyat</option>
+                            <option value="Felsefe">Felsefe</option>
+                            <option value="Ingilizce">İngilizce</option>
+                            <option value="Sanat">Sanat</option>
+                            <option value="Spor">Spor</option>
+                            <option value="GenelKultur">Genel Kültür</option>
+                        </select>
+
+                        <label style="margin-top:10px;">Sorular (15 Satırlık JSON Yapısı - Soru, Şıklar ve correctIndex):</label>
+                        <textarea id="adminRiddleJson" rows="10" style="width:100%; padding:10px; margin-top:5px; border-radius:8px; border:1px solid var(--border); background:#121218; color:#fff; font-family:monospace; font-size:11px; box-sizing:border-box; outline:none;" placeholder="Önce yukarıdan kategori seçin..."></textarea>
                         
-                        <label>Mesaj / İpucu:</label>
-                        <input type="text" id="notifMessage" placeholder="Örn: Gizli kelime ipucu veya kargo teyidi" required style="margin-bottom:8px;">
-                        
-                        <button type="submit" style="background:#00ffcc; color:#121218; margin-top:5px;">Bildirimi Gönder</button>
-                    </form>
-                    
-                    <p style="color:var(--accent); font-size:13px; margin: 15px 0 5px 0; font-weight:bold;">📋 Gönderilen Bildirimler Geçmişi:</p>
-                    <div style="overflow-x:auto; max-height:150px;">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Hedef UID</th>
-                                    <th>Mesaj</th>
-                                    <th>Tarih</th>
-                                    <th>İşlem</th>
-                                </tr>
-                            </thead>
-                            <tbody id="adminSentNotifsList">
-                                <tr><td colspan="4" style="text-align:center; color:#888;">Yükleniyor...</td></tr>
-                            </tbody>
-                        </table>
+                        <button style="margin-top:10px; background:#00ffcc;" onclick="saveCategoryQuestionsAdmin()">Kategori Sorularını Kaydet ve Yayınla</button>
                     </div>
                 </div>
 
@@ -258,7 +252,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getDatabase, ref, get, update, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getDatabase, ref, get, update, push, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA-3zxKcxmWQjVWnvoucMr_t59Cr0ACNYI",
@@ -278,6 +272,7 @@
         let activeUid = null;
         let userCurrentScore = 0;
 
+        // Sekme Değiştirme Fonksiyonu
         window.switchTab = function(type) {
             const tabs = document.querySelectorAll('.tab-btn');
             tabs.forEach(t => t.classList.remove('active'));
@@ -295,6 +290,7 @@
             }
         }
 
+        // Kullanıcı Giriş İşlemi
         window.handleUserLogin = function(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
@@ -302,20 +298,22 @@
             const generalMsg = document.getElementById('generalMsg');
 
             signInWithEmailAndPassword(auth, email, pass)
-                .then(() => {
+                .then((userCredential) => {
                     generalMsg.innerHTML = `<div class='success'>Giriş başarılı! Yönlendiriliyorsunuz...</div>`;
                 })
-                .catch(() => {
+                .catch((error) => {
                     generalMsg.innerHTML = `<div class='error'>Giriş hatası: E-posta veya şifre yanlış.</div>`;
                 });
         }
 
+        // Oturum Durumunu Dinle
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 activeUid = user.uid;
                 document.getElementById('userLoginSection').style.display = 'none';
                 document.getElementById('userDashboard').style.display = 'block';
                 
+                // Kullanıcı verilerini çek
                 const userRef = ref(db, 'users/' + activeUid);
                 get(userRef).then((snapshot) => {
                     if (snapshot.exists()) {
@@ -342,6 +340,7 @@
             });
         }
 
+        // Çekim Talebi Oluşturma
         window.submitWithdraw = function(e) {
             e.preventDefault();
             const talepPuan = parseFloat(document.getElementById('talepPuan').value);
@@ -390,6 +389,7 @@
             });
         }
 
+        // Verileri Dinle (Çekim Talepleri, Kanıtlar ve Mağaza Siparişleri)
         const withdrawalsRef = ref(db, 'withdrawals');
         onValue(withdrawalsRef, (snapshot) => {
             const data = snapshot.val();
@@ -441,7 +441,7 @@
             document.getElementById('statOdenen').innerText = toplamOdenenTL.toFixed(2) + " TL";
         });
 
-        // Mağaza Siparişlerini Dinle
+        // Mağaza Siparişlerini Dinle ve Admin Paneline Yaz
         const ordersRef = ref(db, 'shop_orders');
         onValue(ordersRef, (snapshot) => {
             const data = snapshot.val();
@@ -453,129 +453,115 @@
                 Object.keys(data).reverse().forEach((key) => {
                     const order = data[key];
                     count++;
-                    const isCompleted = order.status === 'Tamamlandı';
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td><b>${order.userEmail}</b><br><small style="color:#888;">${order.date || ''}</small></td>
+                        <td><b>${order.userEmail}</b></td>
                         <td><span style="color:var(--accent);">${order.itemTitle}</span></td>
                         <td><b>${order.itemPrice} P</b></td>
-                        <td><span class="badge ${isCompleted ? 'odendi' : 'bekliyor'}">${order.status || 'Bekliyor'}</span></td>
-                        <td>${!isCompleted ? `<button class="mini-btn" onclick="completeOrder('${key}')">Onayla</button>` : '✅'}</td>
+                        <td><small style="color:#888;">${order.date}</small></td>
+                        <td><span class="badge bekliyor">${order.status || 'Bekliyor'}</span></td>
                     `;
                     tbodyOrders.appendChild(tr);
                 });
             }
             if (count === 0) {
-                tbodyOrders.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#888;">Bekleyen mağaza siparişi yok.</td></tr>`;
+                tbodyOrders.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#888;">Henüz mağazadan ürün alan kimse yok.</td></tr>`;
             }
         });
-
-        // Kayıtlı Kullanıcıları Listeleme (UID ile birlikte)
-        const usersRef = ref(db, 'users');
-        onValue(usersRef, (snapshot) => {
-            const data = snapshot.val();
-            const tbodyUsers = document.getElementById('adminUsersList');
-            tbodyUsers.innerHTML = '';
-            
-            let count = 0;
-            if (data) {
-                Object.keys(data).forEach((uid) => {
-                    const user = data[uid];
-                    count++;
-                    const displayName = user.username || (user.name ? `${user.name} ${user.surname || ''}` : user.email) || 'İsimsiz';
-                    
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><b>${displayName}</b><br><small style="color:#888;">${user.email || ''}</small></td>
-                        <td><code style="color:var(--accent); font-size:10px; background:#121218; padding:2px 4px; border-radius:4px;">${uid}</code></td>
-                        <td><button class="mini-btn" onclick="selectUserForNotif('${uid}')">Seç</button></td>
-                    `;
-                    tbodyUsers.appendChild(tr);
-                });
-            }
-            if (count === 0) {
-                tbodyUsers.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">Kayıtlı kullanıcı yok.</td></tr>`;
-            }
-        });
-
-        // Kullanıcının UID'sini otomatik olarak bildirim inputuna atma
-        window.selectUserForNotif = function(uid) {
-            document.getElementById('notifTargetUid').value = uid;
-            alert("Kullanıcı UID'si seçildi ve bildirim gönderme alanına eklendi!");
-        }
 
         window.markAsPaid = function(key) {
             update(ref(db, 'withdrawals/' + key), { durum: 'Ödendi' });
         }
 
-        window.completeOrder = function(key) {
-            update(ref(db, 'shop_orders/' + key), { status: 'Tamamlandı' });
-        }
+        // --- YENİ: ADMIN SORU YÖNETİMİ FONKSİYONLARI ---
 
-        // Admin Tarafından Kullanıcıya Özel Bildirim/İpucu Gönderme
-        window.sendNotification = function(e) {
-            e.preventDefault();
-            const targetUid = document.getElementById('notifTargetUid').value.trim();
-            const message = document.getElementById('notifMessage').value.trim();
+        // 1. Kelime Oyununu Güncelle
+        window.updateWordGameAdmin = function() {
+            const word = document.getElementById('adminWordInput').value.trim();
+            const hint = document.getElementById('adminHintInput').value.trim();
+            const msgDiv = document.getElementById('adminMsgBox');
 
-            if (!targetUid || !message) return;
+            if (!word || !hint) {
+                msgDiv.innerHTML = `<div class='error'>Kelime ve ipucu boş bırakılamaz!</div>`;
+                return;
+            }
 
-            const notifRef = ref(db, `notifications/${targetUid}`);
-            const newNotifRef = push(notifRef);
-            set(newNotifRef, {
-                title: "Yönetici İpucu & Mesajı",
-                message: message,
-                date: new Date().toLocaleString()
+            set(ref(db, 'questions/wordgame'), {
+                word: word,
+                hint: hint
             }).then(() => {
-                alert("Bildirim başarıyla gönderildi!");
-                document.getElementById('notifTargetUid').value = '';
-                document.getElementById('notifMessage').value = '';
-            }).catch((err) => {
-                alert("Hata: " + err.message);
+                msgDiv.innerHTML = `<div class='success'>Kelime oyunu başarıyla güncellendi! Uygulamaya yansıdı.</div>`;
+            }).catch((error) => {
+                msgDiv.innerHTML = `<div class='error'>Hata: ${error.message}</div>`;
             });
-        }
+        };
 
-        // Gönderilen Bildirimleri Listeleme ve Admin Tarafından Silme
-        const allNotifsRef = ref(db, 'notifications');
-        onValue(allNotifsRef, (snapshot) => {
-            const data = snapshot.val();
-            const tbody = document.getElementById('adminSentNotifsList');
-            tbody.innerHTML = '';
-            
-            let count = 0;
-            if (data) {
-                Object.keys(data).forEach((uid) => {
-                    const userMsgs = data[uid];
-                    if (userMsgs) {
-                        Object.keys(userMsgs).forEach((msgId) => {
-                            const msg = userMsgs[msgId];
-                            count++;
-                            const tr = document.createElement('tr');
-                            tr.innerHTML = `
-                                <td><small style="color:var(--accent);">${uid.substring(0,8)}...</small></td>
-                                <td>${msg.message}</td>
-                                <td><small style="color:#888;">${msg.date}</small></td>
-                                <td><button class="mini-btn" style="background:#ff4d4d; color:#fff;" onclick="deleteAdminNotif('${uid}', '${msgId}')">Sil</button></td>
-                            `;
-                            tbody.appendChild(tr);
+        // 2. Seçilen Kategorinin Sorularını Firebase'den Getir
+        window.loadCategoryForAdmin = function() {
+            const cat = document.getElementById('adminCategorySelect').value;
+            const jsonArea = document.getElementById('adminRiddleJson');
+            const msgDiv = document.getElementById('adminMsgBox');
+
+            if (!cat) {
+                jsonArea.value = '';
+                return;
+            }
+
+            get(ref(db, 'questions/riddle/' + cat)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    jsonArea.value = JSON.stringify(snapshot.val(), null, 2);
+                    msgDiv.innerHTML = `<div class='success'>${cat} kategorisinin soruları yüklendi. Düzenleyebilirsiniz.</div>`;
+                } else {
+                    // Eğer henüz soru yoksa örnek 15'li JSON şablonu oluştur
+                    const defaultQuestions = [];
+                    for (let i = 1; i <= 15; i++) {
+                        defaultQuestions.push({
+                            id: cat.toLowerCase() + i,
+                            question: `${cat} Soru ${i} metnini buraya yazın`,
+                            options: ["Şık A", "Şık B", "Şık C", "Şık D"],
+                            correctIndex: 0
                         });
                     }
-                });
-            }
-            if (count === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">Henüz gönderilen bildirim yok.</td></tr>`;
-            }
-        });
+                    jsonArea.value = JSON.stringify(defaultQuestions, null, 2);
+                    msgDiv.innerHTML = `<div class='success'>Bu kategoriye soru bulunamadı, 15 soruluk örnek şablon yüklendi.</div>`;
+                }
+            }).catch((error) => {
+                msgDiv.innerHTML = `<div class='error'>Soru okuma hatası: ${error.message}</div>`;
+            });
+        };
 
-        window.deleteAdminNotif = function(uid, msgId) {
-            remove(ref(db, `notifications/${uid}/${msgId}`));
-        }
+        // 3. Düzenlenen Kategori Sorularını Firebase'e Kaydet
+        window.saveCategoryQuestionsAdmin = function() {
+            const cat = document.getElementById('adminCategorySelect').value;
+            const jsonAreaVal = document.getElementById('adminRiddleJson').value;
+            const msgDiv = document.getElementById('adminMsgBox');
+
+            if (!cat) {
+                msgDiv.innerHTML = `<div class='error'>Lütfen bir kategori seçin!</div>`;
+                return;
+            }
+
+            try {
+                const parsedData = JSON.parse(jsonAreaVal);
+                if (!Array.isArray(parsedData) || parsedData.length === 0) {
+                    throw new Error("Veri geçerli bir soru dizisi (Array) olmalıdır.");
+                }
+
+                set(ref(db, 'questions/riddle/' + cat), parsedData).then(() => {
+                    msgDiv.innerHTML = `<div class='success'>${cat} kategorisi için sorular başarıyla Firebase'e kaydedildi! Uygulamada anında güncellendi.</div>`;
+                }).catch((error) => {
+                    msgDiv.innerHTML = `<div class='error'>Kayıt hatası: ${error.message}</div>`;
+                });
+            } catch (e) {
+                msgDiv.innerHTML = `<div class='error'>Geçersiz JSON formatı: ${e.message}</div>`;
+            }
+        };
     </script>
 
     <script>
         window.checkAdmin = function() {
             const pass = document.getElementById('adminPass').value;
-            if (pass === "Kubi13579+-") {
+            if (pass === "Kubi13579+-") { // Yönetici Şifreniz
                 document.getElementById('adminLoginBox').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
             } else {
