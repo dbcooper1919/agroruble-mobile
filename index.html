@@ -158,7 +158,7 @@
                     </table>
                 </div>
 
-                <!-- Mağaza Siparişleri Takibi (Admin Paneli İçinde) -->
+                <!-- Mağaza Siparişleri Takibi ve Onay Butonu -->
                 <p style="color:var(--accent); font-size:13px; margin: 20px 0 5px 0; font-weight:bold;">🎁 Mağaza Siparişleri Takibi:</p>
                 <div style="overflow-x:auto; max-height:200px;">
                     <table>
@@ -167,14 +167,45 @@
                                 <th>Kullanıcı E-posta</th>
                                 <th>Ürün</th>
                                 <th>Tutar</th>
-                                <th>Tarih</th>
                                 <th>Durum</th>
+                                <th>İşlem</th>
                             </tr>
                         </thead>
                         <tbody id="shopOrdersList">
                             <tr><td colspan="5" style="text-align:center; color:#888;">Yükleniyor...</td></tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Kullanıcıya Özel Bildirim / İpucu Gönderme Paneli -->
+                <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
+                    <p style="color:var(--accent); font-size:13px; margin-bottom: 5px; font-weight:bold;">📤 Kullanıcıya Özel İpucu / Bildirim Gönder:</p>
+                    <form onsubmit="sendNotification(event)">
+                        <label>Kullanıcı UID:</label>
+                        <input type="text" id="notifTargetUid" placeholder="Kullanıcının Firebase UID'si" required style="margin-bottom:8px;">
+                        
+                        <label>Mesaj / İpucu:</label>
+                        <input type="text" id="notifMessage" placeholder="Örn: Gizli kelime ipucu veya kargo teyidi" required style="margin-bottom:8px;">
+                        
+                        <button type="submit" style="background:#00ffcc; color:#121218; margin-top:5px;">Bildirimi Gönder</button>
+                    </form>
+                    
+                    <p style="color:var(--accent); font-size:13px; margin: 15px 0 5px 0; font-weight:bold;">📋 Gönderilen Bildirimler Geçmişi:</p>
+                    <div style="overflow-x:auto; max-height:150px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Hedef UID</th>
+                                    <th>Mesaj</th>
+                                    <th>Tarih</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminSentNotifsList">
+                                <tr><td colspan="4" style="text-align:center; color:#888;">Yükleniyor...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <button style="background:#ff4d4d; margin-top:20px; color:#fff;" onclick="logoutAdmin()">Yönetici Çıkış</button>
@@ -210,7 +241,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getDatabase, ref, get, update, push, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getDatabase, ref, get, update, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA-3zxKcxmWQjVWnvoucMr_t59Cr0ACNYI",
@@ -230,7 +261,6 @@
         let activeUid = null;
         let userCurrentScore = 0;
 
-        // Sekme Değiştirme Fonksiyonu
         window.switchTab = function(type) {
             const tabs = document.querySelectorAll('.tab-btn');
             tabs.forEach(t => t.classList.remove('active'));
@@ -248,7 +278,6 @@
             }
         }
 
-        // Kullanıcı Giriş İşlemi
         window.handleUserLogin = function(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
@@ -256,22 +285,20 @@
             const generalMsg = document.getElementById('generalMsg');
 
             signInWithEmailAndPassword(auth, email, pass)
-                .then((userCredential) => {
+                .then(() => {
                     generalMsg.innerHTML = `<div class='success'>Giriş başarılı! Yönlendiriliyorsunuz...</div>`;
                 })
-                .catch((error) => {
+                .catch(() => {
                     generalMsg.innerHTML = `<div class='error'>Giriş hatası: E-posta veya şifre yanlış.</div>`;
                 });
         }
 
-        // Oturum Durumunu Dinle
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 activeUid = user.uid;
                 document.getElementById('userLoginSection').style.display = 'none';
                 document.getElementById('userDashboard').style.display = 'block';
                 
-                // Kullanıcı verilerini çek
                 const userRef = ref(db, 'users/' + activeUid);
                 get(userRef).then((snapshot) => {
                     if (snapshot.exists()) {
@@ -298,7 +325,6 @@
             });
         }
 
-        // Çekim Talebi Oluşturma
         window.submitWithdraw = function(e) {
             e.preventDefault();
             const talepPuan = parseFloat(document.getElementById('talepPuan').value);
@@ -347,7 +373,6 @@
             });
         }
 
-        // Verileri Dinle (Çekim Talepleri, Kanıtlar ve Mağaza Siparişleri)
         const withdrawalsRef = ref(db, 'withdrawals');
         onValue(withdrawalsRef, (snapshot) => {
             const data = snapshot.val();
@@ -399,7 +424,7 @@
             document.getElementById('statOdenen').innerText = toplamOdenenTL.toFixed(2) + " TL";
         });
 
-        // Mağaza Siparişlerini Dinle ve Admin Paneline Yaz
+        // Mağaza Siparişlerini Dinle
         const ordersRef = ref(db, 'shop_orders');
         onValue(ordersRef, (snapshot) => {
             const data = snapshot.val();
@@ -411,31 +436,95 @@
                 Object.keys(data).reverse().forEach((key) => {
                     const order = data[key];
                     count++;
+                    const isCompleted = order.status === 'Tamamlandı';
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td><b>${order.userEmail}</b></td>
+                        <td><b>${order.userEmail}</b><br><small style="color:#888;">${order.date || ''}</small></td>
                         <td><span style="color:var(--accent);">${order.itemTitle}</span></td>
                         <td><b>${order.itemPrice} P</b></td>
-                        <td><small style="color:#888;">${order.date}</small></td>
-                        <td><span class="badge bekliyor">${order.status || 'Bekliyor'}</span></td>
+                        <td><span class="badge ${isCompleted ? 'odendi' : 'bekliyor'}">${order.status || 'Bekliyor'}</span></td>
+                        <td>${!isCompleted ? `<button class="mini-btn" onclick="completeOrder('${key}')">Onayla</button>` : '✅'}</td>
                     `;
                     tbodyOrders.appendChild(tr);
                 });
             }
             if (count === 0) {
-                tbodyOrders.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#888;">Henüz mağazadan ürün alan kimse yok.</td></tr>`;
+                tbodyOrders.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#888;">Bekleyen mağaza siparişi yok.</td></tr>`;
             }
         });
 
         window.markAsPaid = function(key) {
             update(ref(db, 'withdrawals/' + key), { durum: 'Ödendi' });
         }
+
+        window.completeOrder = function(key) {
+            update(ref(db, 'shop_orders/' + key), { status: 'Tamamlandı' });
+        }
+
+        // Admin Tarafından Kullanıcıya Özel Bildirim/İpucu Gönderme
+        window.sendNotification = function(e) {
+            e.preventDefault();
+            const targetUid = document.getElementById('notifTargetUid').value.trim();
+            const message = document.getElementById('notifMessage').value.trim();
+
+            if (!targetUid || !message) return;
+
+            const notifRef = ref(db, `notifications/${targetUid}`);
+            const newNotifRef = push(notifRef);
+            set(newNotifRef, {
+                title: "Yönetici İpucu & Mesajı",
+                message: message,
+                date: new Date().toLocaleString()
+            }).then(() => {
+                alert("Bildirim başarıyla gönderildi!");
+                document.getElementById('notifTargetUid').value = '';
+                document.getElementById('notifMessage').value = '';
+            }).catch((err) => {
+                alert("Hata: " + err.message);
+            });
+        }
+
+        // Gönderilen Bildirimleri Listeleme ve Admin Tarafından Silme
+        const allNotifsRef = ref(db, 'notifications');
+        onValue(allNotifsRef, (snapshot) => {
+            const data = snapshot.val();
+            const tbody = document.getElementById('adminSentNotifsList');
+            tbody.innerHTML = '';
+            
+            let count = 0;
+            if (data) {
+                Object.keys(data).forEach((uid) => {
+                    const userMsgs = data[uid];
+                    if (userMsgs) {
+                        Object.keys(userMsgs).forEach((msgId) => {
+                            const msg = userMsgs[msgId];
+                            count++;
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td><small style="color:var(--accent);">${uid.substring(0,8)}...</small></td>
+                                <td>${msg.message}</td>
+                                <td><small style="color:#888;">${msg.date}</small></td>
+                                <td><button class="mini-btn" style="background:#ff4d4d; color:#fff;" onclick="deleteAdminNotif('${uid}', '${msgId}')">Sil</button></td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    }
+                });
+            }
+            if (count === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">Henüz gönderilen bildirim yok.</td></tr>`;
+            }
+        });
+
+        window.deleteAdminNotif = function(uid, msgId) {
+            remove(ref(db, `notifications/${uid}/${msgId}`));
+        }
     </script>
 
     <script>
         window.checkAdmin = function() {
             const pass = document.getElementById('adminPass').value;
-            if (pass === "Kubi13579+-") { // Yönetici Şifreniz
+            if (pass === "Kubi13579+-") {
                 document.getElementById('adminLoginBox').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
             } else {
