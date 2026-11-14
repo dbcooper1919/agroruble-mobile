@@ -191,7 +191,7 @@
                     </div>
 
                     <form onsubmit="saveAll15Questions(event)">
-                        <div id="questionsInputsContainer" style="margin-top: 15px; max-height: 400px; overflow-y: auto; padding-right: 5px;">
+                        <div id="questionsInputsContainer" style="margin-top: 15px; max-height: 450px; overflow-y: auto; padding-right: 5px; border: 1px solid var(--border); padding: 10px; border-radius: 8px;">
                             <!-- JavaScript buraya otomatik olarak 15 adet soru kutusu dolduracak -->
                         </div>
 
@@ -285,6 +285,7 @@
         // 15 Soru kutusunu oluşturan fonksiyon
         function renderQuestionInputs() {
             const container = document.getElementById('questionsInputsContainer');
+            if (!container) return;
             container.innerHTML = '';
             for (let i = 1; i <= 15; i++) {
                 container.innerHTML += `
@@ -324,7 +325,7 @@
             }
         }
 
-        // Sayfa açıldığında 15 kutuyu oluştur
+        // Sayfa yüklendiğinde otomatik çalıştır
         renderQuestionInputs();
 
         window.switchTab = function(type) {
@@ -341,6 +342,7 @@
                 document.getElementById('userLoginSection').style.display = 'none';
                 document.getElementById('userDashboard').style.display = 'none';
                 document.getElementById('adminSection').style.display = 'block';
+                renderQuestionInputs();
                 loadCategoryQuestionsForAdmin();
             }
         }
@@ -675,6 +677,7 @@
             if (pass === "Kubi13579+-") {
                 document.getElementById('adminLoginBox').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
+                renderQuestionInputs();
                 loadCategoryQuestionsForAdmin();
             } else {
                 alert("Yönetici şifresi hatalı!");
