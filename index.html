@@ -47,6 +47,11 @@
         .danger-btn { background: #ff4d4d !important; color: #fff !important; }
         .logout-sm { background: #ff4d4d !important; color: #fff !important; padding: 6px 12px; font-size: 11px; margin: 0; width: auto; }
 
+        .question-card { background: #121218; border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+        .question-card h4 { color: var(--accent); margin: 0 0 8px 0; font-size: 13px; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+
+        /* Admin Chat Penceresi */
         .chat-box-admin { background: #121218; border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-top: 15px; }
         .chat-messages { max-height: 250px; overflow-y: auto; margin-bottom: 10px; padding-right: 5px; }
         .admin-msg-bubble { padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; line-height: 1.4; border: 1px solid var(--border); }
@@ -86,7 +91,7 @@
                 <div>
                     🆔 <b id="userName">Yükleniyor...</b><br>
                     ⭐ <b id="puanDisplay">0</b> Puan<br>
-                    💵 <b id="tlDisplay">0.00 TL</b> (Min: 3000 Puan)
+                    💵 <b id="tlDisplay">0.00 TL</b> (Min: 10 TL)
                 </div>
                 <button class="logout-sm" onclick="handleLogout()">Çıkış</button>
             </div>
@@ -110,8 +115,8 @@
                 </select>
                 <label>IBAN veya Hesap Numarası:</label>
                 <input type="text" id="iban" placeholder="TR..." required>
-                <label>Çekilmek İstenen Puan (Min: 3000 P):</label>
-                <input type="number" id="talepPuan" placeholder="Örn: 3000" min="3000" step="any" required>
+                <label>Çekilmek İstenen Puan (Min: 2600 P = 10 TL):</label>
+                <input type="number" id="talepPuan" placeholder="Örn: 3000" min="2600" step="any" required>
                 <button type="submit">Çekim Talebi Oluştur</button>
             </form>
         </div>
@@ -135,7 +140,7 @@
                 </div>
 
                 <p style="color:var(--accent); font-size:13px; margin: 15px 0 5px 0; font-weight:bold;">📋 Tüm Çekim Talepleri:</p>
-                <div style="overflow-x:auto; max-height:220px;">
+                <div style="overflow-x:auto; max-height:200px;">
                     <table>
                         <thead>
                             <tr>
@@ -179,6 +184,24 @@
                         <input type="text" id="adminReplyInput" placeholder="Yanıt yazın..." style="margin:0;">
                         <button onclick="sendAdminReply()" style="margin:0; width:90px; padding:8px;">Gönder</button>
                     </div>
+                </div>
+
+                <p style="color:var(--accent); font-size:13px; margin: 20px 0 5px 0; font-weight:bold;">🎁 Mağaza Siparişleri Takibi:</p>
+                <div style="overflow-x:auto; max-height:200px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Kullanıcı E-posta</th>
+                                <th>Ürün</th>
+                                <th>Tutar</th>
+                                <th>Tarih</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shopOrdersList">
+                            <tr><td colspan="5" style="text-align:center; color:#888;">Henüz mağazadan ürün alan kimse yok.</td></tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <button style="background:#ff4d4d; margin-top:20px; color:#fff;" onclick="logoutAdmin()">Yönetici Çıkış</button>
@@ -298,8 +321,8 @@
                 return;
             }
 
-            if (talepPuan < 3000) {
-                msgBox.innerHTML = `<div class='error'>Minimum çekim tutarı 3000 Puandır.</div>`;
+            if (talepPuan < 2600) {
+                msgBox.innerHTML = `<div class='error'>Minimum çekim tutarı 2600 Puandır.</div>`;
                 return;
             }
 
@@ -327,66 +350,6 @@
                 msgBox.innerHTML = `<div class='error'>Hata: ${error.message}</div>`;
             });
         }
-
-        // ÇEKİM TALEPLERİNİ YÖNETİCİ PANELİNDE LİSTELEME
-        const withdrawalsRef = ref(db, 'withdrawals');
-        onValue(withdrawalsRef, (snapshot) => {
-            const data = snapshot.val();
-            const tbody = document.getElementById('talepListesi');
-            tbody.innerHTML = '';
-
-            let bekleyenSayisi = 0;
-            let toplamOdenenTL = 0;
-            let count = 0;
-
-            if (data) {
-                Object.keys(data).forEach((id) => {
-                    const item = data[id];
-                    count++;
-
-                    if (item.durum === 'Bekliyor') {
-                        bekleyenSayisi++;
-                    } else if (item.durum === 'Ödendi') {
-                        toplamOdenenTL += parseFloat(item.tl_tutar || 0);
-                    }
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><b>${item.isim_soyisim}</b><br><small>${item.banka}: ${item.iban}</small></td>
-                        <td>${item.puan} P<br><b>${item.tl_tutar} TL</b></td>
-                        <td><span class="badge ${item.durum === 'Ödendi' ? 'odendi' : 'bekliyor'}">${item.durum}</span></td>
-                        <td>
-                            ${item.durum === 'Bekliyor' ? `<button class="mini-btn" onclick="approveWithdrawal('${id}')">Öde</button>` : ''}
-                            <button class="mini-btn danger-btn" onclick="deleteWithdrawal('${id}')">Sil</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-
-            if (count === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">Henüz çekim talebi yok.</td></tr>`;
-            }
-
-            document.getElementById('statBekleyen').innerText = bekleyenSayisi;
-            document.getElementById('statOdenen').innerText = toplamOdenenTL.toFixed(2) + " TL";
-        });
-
-        // ÇEKİM TALEBİNİ ONAYLA (ÖDENDİ YAP)
-        window.approveWithdrawal = function(id) {
-            update(ref(db, `withdrawals/${id}`), { durum: 'Ödendi' }).then(() => {
-                alert("Talep ödendi olarak işaretlendi.");
-            });
-        };
-
-        // ÇEKİM TALEBİNİ SİL
-        window.deleteWithdrawal = function(id) {
-            if (confirm("Bu talebi silmek istediğinize emin misiniz?")) {
-                remove(ref(db, `withdrawals/${id}`)).then(() => {
-                    alert("Talep silindi.");
-                });
-            }
-        };
 
         // CANLI DESTEK TALEPLERİNİ LİSTELEME
         const supportRef = ref(db, 'support_tickets');
@@ -469,6 +432,7 @@
                 date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }).then(() => {
                 inputEl.value = '';
+                // Meta güncelleme
                 update(ref(db, `support_tickets/${currentActiveChatUid}/meta`), {
                     lastMessage: "Destek yanıtladı: " + text,
                     updatedAt: Date.now()
@@ -478,7 +442,7 @@
 
         // TALEBİ / SOHBETİ İKİ TARAFTAN SİLME
         window.deleteTicket = function(uid) {
-            if (confirm("Bu destek talebini tamamen silmek istediğinize emin misiniz?")) {
+            if (confirm("Bu destek talebini tamamen silmek istediğinize emin misiniz? (Kullanıcıda da silinecektir)")) {
                 remove(ref(db, `support_tickets/${uid}`)).then(() => {
                     if (currentActiveChatUid === uid) {
                         closeChat();
