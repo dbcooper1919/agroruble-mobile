@@ -86,7 +86,7 @@
                 <div>
                     🆔 <b id="userName">Yükleniyor...</b><br>
                     ⭐ <b id="puanDisplay">0</b> Puan<br>
-                    💵 <b id="tlDisplay">0.00 TL</b> (Min: 10 TL)
+                    💵 <b id="tlDisplay">0.00 TL</b> (Min: 3000 Puan)
                 </div>
                 <button class="logout-sm" onclick="handleLogout()">Çıkış</button>
             </div>
@@ -110,8 +110,8 @@
                 </select>
                 <label>IBAN veya Hesap Numarası:</label>
                 <input type="text" id="iban" placeholder="TR..." required>
-                <label>Çekilmek İstenen Puan (Min: 2600 P = 10 TL):</label>
-                <input type="number" id="talepPuan" placeholder="Örn: 3000" min="2600" step="any" required>
+                <label>Çekilmek İstenen Puan (Min: 3000 P):</label>
+                <input type="number" id="talepPuan" placeholder="Örn: 3000" min="3000" step="any" required>
                 <button type="submit">Çekim Talebi Oluştur</button>
             </form>
         </div>
@@ -298,8 +298,8 @@
                 return;
             }
 
-            if (talepPuan < 2600) {
-                msgBox.innerHTML = `<div class='error'>Minimum çekim tutarı 2600 Puandır.</div>`;
+            if (talepPuan < 3000) {
+                msgBox.innerHTML = `<div class='error'>Minimum çekim tutarı 3000 Puandır.</div>`;
                 return;
             }
 
@@ -328,7 +328,7 @@
             });
         }
 
-        // ÇEKİM TALEPLERİNİ YÖNETİCİ PANELİNDE LİSTELEME (Eksik olan dinleyici buydu)
+        // ÇEKİM TALEPLERİNİ YÖNETİCİ PANELİNDE LİSTELEME
         const withdrawalsRef = ref(db, 'withdrawals');
         onValue(withdrawalsRef, (snapshot) => {
             const data = snapshot.val();
