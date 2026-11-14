@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgroRuble - Ödül ve Çekim Merkezi</title>
+    <title>AgroRuble - Yönetim ve Çekim Merkezi</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#121218">
     <style>
@@ -17,7 +17,7 @@
             --border: #2a2a3d;
         }
         body { background: var(--bg-color); color: var(--text-main); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; box-sizing: border-box; }
-        .container { background: var(--card-bg); padding: 25px; border-radius: 16px; width: 100%; max-width: 600px; border: 1px solid var(--border); box-sizing: border-box; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        .container { background: var(--card-bg); padding: 25px; border-radius: 16px; width: 100%; max-width: 650px; border: 1px solid var(--border); box-sizing: border-box; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
         h2 { color: var(--accent); text-align: center; margin-bottom: 20px; font-size: 22px; letter-spacing: 0.5px; }
         .user-box { background: #162b32; padding: 15px; border-radius: 10px; border: 1px solid rgba(0,255,204,0.3); margin-bottom: 20px; font-size: 13px; line-height: 1.6; display: flex; justify-content: space-between; align-items: center; }
         .user-box b { color: var(--accent); }
@@ -47,11 +47,9 @@
         .danger-btn { background: #ff4d4d !important; color: #fff !important; }
         .logout-sm { background: #ff4d4d !important; color: #fff !important; padding: 6px 12px; font-size: 11px; margin: 0; width: auto; }
 
-        .question-card { background: #121218; border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-bottom: 12px; }
-        .question-card h4 { color: var(--accent); margin: 0 0 8px 0; font-size: 13px; }
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+        .admin-section-box { background: #181822; border: 1px solid var(--border); padding: 15px; border-radius: 10px; margin-top: 15px; }
+        .admin-section-box h3 { color: var(--accent); margin-top: 0; font-size: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
 
-        /* Admin Chat Penceresi */
         .chat-box-admin { background: #121218; border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-top: 15px; }
         .chat-messages { max-height: 250px; overflow-y: auto; margin-bottom: 10px; padding-right: 5px; }
         .admin-msg-bubble { padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; line-height: 1.4; border: 1px solid var(--border); }
@@ -154,6 +152,60 @@
                             <tr><td colspan="4" style="text-align:center; color:#888;">Yükleniyor...</td></tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- 🔤 KELİME OYUNU GÜNCELLEME ALANI -->
+                <div class="admin-section-box">
+                    <h3>🔤 Kelime Oyunu (Wordgame) Güncelle</h3>
+                    <form onsubmit="updateWordGame(event)">
+                        <label>Gizli Kelime:</label>
+                        <input type="text" id="adminWord" placeholder="Örn: saman" required>
+                        <label>İpucu Metni:</label>
+                        <input type="text" id="adminWordHint" placeholder="Örn: Sakla samanı gelir zamanı" required>
+                        <button type="submit" style="margin-top:10px;">Kelimeyi Güncelle</button>
+                    </form>
+                </div>
+
+                <!-- 🧠 BİLGİ YARIŞMASI (RİDDLE) SORU EKLEME ALANI -->
+                <div class="admin-section-box">
+                    <h3>🧠 Bilgi Yarışması Soru Ekle</h3>
+                    <form onsubmit="addRiddleQuestion(event)">
+                        <label>Kategori:</label>
+                        <select id="riddleCategory" required>
+                            <option value="Matematik">Matematik</option>
+                            <option value="Fizik">Fizik</option>
+                            <option value="Kimya">Kimya</option>
+                            <option value="Biyoloji">Biyoloji</option>
+                            <option value="Tarih">Tarih</option>
+                            <option value="Cografya">Coğrafya</option>
+                            <option value="Edebiyat">Edebiyat</option>
+                            <option value="Felsefe">Felsefe</option>
+                            <option value="Ingilizce">İngilizce</option>
+                            <option value="Sanat">Sanat</option>
+                            <option value="Spor">Spor</option>
+                            <option value="GenelKultur">Genel Kültür</option>
+                        </select>
+                        <label>Soru Metni:</label>
+                        <textarea id="riddleQuestionText" placeholder="Soruyu buraya yazın..." rows="2" required></textarea>
+                        
+                        <label>Şık A:</label>
+                        <input type="text" id="opt0" placeholder="A şıkkı" required>
+                        <label>Şık B:</label>
+                        <input type="text" id="opt1" placeholder="B şıkkı" required>
+                        <label>Şık C:</label>
+                        <input type="text" id="opt2" placeholder="C şıkkı" required>
+                        <label>Şık D:</label>
+                        <input type="text" id="opt3" placeholder="D şıkkı" required>
+
+                        <label>Doğru Şık İndeksi (0: A, 1: B, 2: C, 3: D):</label>
+                        <select id="correctIndex" required>
+                            <option value="0">A Şıkkı</option>
+                            <option value="1">B Şıkkı</option>
+                            <option value="2">C Şıkkı</option>
+                            <option value="3">D Şıkkı</option>
+                        </select>
+                        <button type="submit" style="margin-top:10px;">Soru Ekle</button>
+                    </form>
                 </div>
 
                 <!-- CANLI DESTEK TALEPLERİ YÖNETİMİ -->
@@ -351,6 +403,120 @@
             });
         }
 
+        // KELİME OYUNU GÜNCELLEME FONKSİYONU
+        window.updateWordGame = function(e) {
+            e.preventDefault();
+            const word = document.getElementById('adminWord').value.trim().toLowerCase();
+            const hint = document.getElementById('adminWordHint').value.trim();
+
+            set(ref(db, 'questions/wordgame'), {
+                word: word,
+                hint: hint
+            }).then(() => {
+                alert("Kelime oyunu başarıyla güncellendi!");
+            }).catch((err) => {
+                alert("Hata: " + err.message);
+            });
+        };
+
+        // BİLGİ YARIŞMASI SORU EKLEME FONKSİYONU
+        window.addRiddleQuestion = function(e) {
+            e.preventDefault();
+            const category = document.getElementById('riddleCategory').value;
+            const question = document.getElementById('riddleQuestionText').value.trim();
+            const options = [
+                document.getElementById('opt0').value.trim(),
+                document.getElementById('opt1').value.trim(),
+                document.getElementById('opt2').value.trim(),
+                document.getElementById('opt3').value.trim()
+            ];
+            const correctIndex = parseInt(document.getElementById('correctIndex').value);
+
+            const qRef = ref(db, `questions/riddle/${category}`);
+            get(qRef).then((snapshot) => {
+                let questionsList = [];
+                if (snapshot.exists()) {
+                    questionsList = snapshot.val();
+                    if (!Array.isArray(questionsList)) {
+                        questionsList = Object.values(questionsList);
+                    }
+                }
+
+                const newId = 'r_' + Date.now();
+                questionsList.push({
+                    id: newId,
+                    question: question,
+                    options: options,
+                    correctIndex: correctIndex
+                });
+
+                set(qRef, questionsList).then(() => {
+                    alert(`"${category}" kategorisine yeni soru başarıyla eklendi!`);
+                    document.getElementById('riddleQuestionText').value = '';
+                    document.getElementById('opt0').value = '';
+                    document.getElementById('opt1').value = '';
+                    document.getElementById('opt2').value = '';
+                    document.getElementById('opt3').value = '';
+                });
+            }).catch((err) => {
+                alert("Hata: " + err.message);
+            });
+        };
+
+        // ÇEKİM TALEPLERİNİ ADMIN PANELİNDE LİSTELEME
+        const withdrawalsRef = ref(db, 'withdrawals');
+        onValue(withdrawalsRef, (snapshot) => {
+            const data = snapshot.val();
+            const talepListesi = document.getElementById('talepListesi');
+            talepListesi.innerHTML = '';
+
+            let bekleyenSayisi = 0;
+            let toplamOdenenTL = 0;
+            let count = 0;
+
+            if (data) {
+                Object.keys(data).forEach((key) => {
+                    const item = data[key];
+                    count++;
+
+                    if (item.durum === 'Bekliyor') {
+                        bekleyenSayisi++;
+                    } else if (item.durum === 'Ödendi') {
+                        toplamOdenenTL += parseFloat(item.tl_tutar || 0);
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><b>${item.isim_soyisim}</b><br><small style="color:#b0b0c0;">${item.banka} - ${item.iban}</small></td>
+                        <td>${item.puan} P<br><small style="color:var(--accent);">${item.tl_tutar} TL</small></td>
+                        <td><span class="badge ${item.durum === 'Ödendi' ? 'odendi' : 'bekliyor'}">${item.durum}</span></td>
+                        <td>
+                            ${item.durum === 'Bekliyor' ? `<button class="mini-btn" onclick="markAsPaid('${key}')">Ödendi Yap</button>` : ''}
+                            <button class="mini-btn danger-btn" onclick="deleteWithdrawal('${key}')">Sil</button>
+                        </td>
+                    `;
+                    talepListesi.appendChild(tr);
+                });
+            }
+
+            if (count === 0) {
+                talepListesi.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">Henüz çekim talebi yok.</td></tr>`;
+            }
+
+            document.getElementById('statBekleyen').innerText = bekleyenSayisi;
+            document.getElementById('statOdenen').innerText = toplamOdenenTL.toFixed(2) + " TL";
+        });
+
+        window.markAsPaid = function(key) {
+            update(ref(db, `withdrawals/${key}`), { durum: 'Ödendi' });
+        };
+
+        window.deleteWithdrawal = function(key) {
+            if (confirm("Bu talebi silmek istediğinize emin misiniz?")) {
+                remove(ref(db, `withdrawals/${key}`));
+            }
+        };
+
         // CANLI DESTEK TALEPLERİNİ LİSTELEME
         const supportRef = ref(db, 'support_tickets');
         onValue(supportRef, (snapshot) => {
@@ -432,7 +598,6 @@
                 date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }).then(() => {
                 inputEl.value = '';
-                // Meta güncelleme
                 update(ref(db, `support_tickets/${currentActiveChatUid}/meta`), {
                     lastMessage: "Destek yanıtladı: " + text,
                     updatedAt: Date.now()
@@ -440,9 +605,8 @@
             });
         };
 
-        // TALEBİ / SOHBETİ İKİ TARAFTAN SİLME
         window.deleteTicket = function(uid) {
-            if (confirm("Bu destek talebini tamamen silmek istediğinize emin misiniz? (Kullanıcıda da silinecektir)")) {
+            if (confirm("Bu destek talebini tamamen silmek istediğinize emin misiniz?")) {
                 remove(ref(db, `support_tickets/${uid}`)).then(() => {
                     if (currentActiveChatUid === uid) {
                         closeChat();
