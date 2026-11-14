@@ -166,12 +166,12 @@
                     </form>
                 </div>
 
-                <!-- 🧠 BİLGİ YARIŞMASI (RİDDLE) SORU EKLEME ALANI -->
+                <!-- 🧠 BİLGİ YARIŞMASI (RİDDLE) KUTU / PAKET YÖNETİMİ -->
                 <div class="admin-section-box">
-                    <h3>🧠 Bilgi Yarışması Soru Ekle</h3>
+                    <h3>🧠 Bilgi Yarışması Soru Paketi Yönetimi (15'erli Kutular)</h3>
                     <form onsubmit="addRiddleQuestion(event)">
-                        <label>Kategori:</label>
-                        <select id="riddleCategory" required>
+                        <label>Kategori Seçin:</label>
+                        <select id="riddleCategory" onchange="loadCategoryQuestionsForAdmin()" required>
                             <option value="Matematik">Matematik</option>
                             <option value="Fizik">Fizik</option>
                             <option value="Kimya">Kimya</option>
@@ -185,7 +185,13 @@
                             <option value="Spor">Spor</option>
                             <option value="GenelKultur">Genel Kültür</option>
                         </select>
-                        <label>Soru Metni:</label>
+
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                            <span id="categoryQuestionCount" style="font-size:12px; color:var(--accent);">Mevcut Soru Sayısı: Yükleniyor...</span>
+                            <button type="button" class="mini-btn danger-btn" onclick="clearCategoryQuestions()" style="margin:0; width:auto; padding:6px 12px;">Kutuyu Tamamen Temizle (Sıfırla)</button>
+                        </div>
+
+                        <label style="margin-top:15px;">Yeni Soru Ekle:</label>
                         <textarea id="riddleQuestionText" placeholder="Soruyu buraya yazın..." rows="2" required></textarea>
                         
                         <label>Şık A:</label>
@@ -197,14 +203,14 @@
                         <label>Şık D:</label>
                         <input type="text" id="opt3" placeholder="D şıkkı" required>
 
-                        <label>Doğru Şık İndeksi (0: A, 1: B, 2: C, 3: D):</label>
+                        <label>Doğru Şık:</label>
                         <select id="correctIndex" required>
                             <option value="0">A Şıkkı</option>
                             <option value="1">B Şıkkı</option>
                             <option value="2">C Şıkkı</option>
                             <option value="3">D Şıkkı</option>
                         </select>
-                        <button type="submit" style="margin-top:10px;">Soru Ekle</button>
+                        <button type="submit" style="margin-top:10px;">Pakete Soru Ekle</button>
                     </form>
                 </div>
 
@@ -305,6 +311,7 @@
                 document.getElementById('userLoginSection').style.display = 'none';
                 document.getElementById('userDashboard').style.display = 'none';
                 document.getElementById('adminSection').style.display = 'block';
+                loadCategoryQuestionsForAdmin();
             }
         }
 
@@ -419,6 +426,42 @@
             });
         };
 
+        // KATEGORİ SORU SAYISINI GÖSTERME
+        window.loadCategoryQuestionsForAdmin = function() {
+            const category = document.getElementById('riddleCategory').value;
+            const countEl = document.getElementById('categoryQuestionCount');
+            countEl.innerText = "Yükleniyor...";
+
+            get(ref(db, `questions/riddle/${category}`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    let list = snapshot.val();
+                    if (!Array.isArray(list)) list = Object.values(list);
+                    countEl.innerText = `Mevcut Soru Sayısı: ${list.length} / 15`;
+                    if(list.length < 15) {
+                        countEl.style.color = "#ffaa00";
+                    } else if(list.length === 15) {
+                        countEl.style.color = "#00ffcc";
+                    } else {
+                        countEl.style.color = "#ff4d4d";
+                    }
+                } else {
+                    countEl.innerText = "Mevcut Soru Sayısı: 0 (Kutu Boş)";
+                    countEl.style.color = "#ff4d4d";
+                }
+            });
+        };
+
+        // KATEGORİYİ TAMAMEN TEMİZLEME (YENİ HAFTALIK/GÜNLÜK PAKET İÇİN)
+        window.clearCategoryQuestions = function() {
+            const category = document.getElementById('riddleCategory').value;
+            if (confirm(`"${category}" kategorisindeki TÜM soruları silmek ve kutuyu boşaltmak istediğinize emin misiniz? (Yeni haftalık/günlük 15 soru yüklemeden önce temizleyebilirsiniz)`)) {
+                set(ref(db, `questions/riddle/${category}`), null).then(() => {
+                    alert("Kutu tamamen sıfırlandı!");
+                    loadCategoryQuestionsForAdmin();
+                });
+            }
+        };
+
         // BİLGİ YARIŞMASI SORU EKLEME FONKSİYONU
         window.addRiddleQuestion = function(e) {
             e.preventDefault();
@@ -442,6 +485,11 @@
                     }
                 }
 
+                if (questionsList.length >= 15) {
+                    alert("Bu kutu zaten 15 soruya ulaştı! Yeni soru eklemek için önce 'Kutuyu Tamamen Temizle' butonuna basarak eski paketi silebilirsiniz.");
+                    return;
+                }
+
                 const newId = 'r_' + Date.now();
                 questionsList.push({
                     id: newId,
@@ -451,12 +499,13 @@
                 });
 
                 set(qRef, questionsList).then(() => {
-                    alert(`"${category}" kategorisine yeni soru başarıyla eklendi!`);
+                    alert(`"${category}" kutusuna soru eklendi!`);
                     document.getElementById('riddleQuestionText').value = '';
                     document.getElementById('opt0').value = '';
                     document.getElementById('opt1').value = '';
                     document.getElementById('opt2').value = '';
                     document.getElementById('opt3').value = '';
+                    loadCategoryQuestionsForAdmin();
                 });
             }).catch((err) => {
                 alert("Hata: " + err.message);
@@ -621,6 +670,7 @@
             if (pass === "Kubi13579+-") {
                 document.getElementById('adminLoginBox').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
+                loadCategoryQuestionsForAdmin();
             } else {
                 alert("Yönetici şifresi hatalı!");
             }
