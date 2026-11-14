@@ -166,51 +166,36 @@
                     </form>
                 </div>
 
-                <!-- 🧠 BİLGİ YARIŞMASI (RİDDLE) KUTU / PAKET YÖNETİMİ -->
+                <!-- 🧠 BİLGİ YARIŞMASI (RİDDLE) 15 SORULUK FORM ALANI -->
                 <div class="admin-section-box">
-                    <h3>🧠 Bilgi Yarışması Soru Paketi Yönetimi (15'erli Kutular)</h3>
-                    <form onsubmit="addRiddleQuestion(event)">
-                        <label>Kategori Seçin:</label>
-                        <select id="riddleCategory" onchange="loadCategoryQuestionsForAdmin()" required>
-                            <option value="Matematik">Matematik</option>
-                            <option value="Fizik">Fizik</option>
-                            <option value="Kimya">Kimya</option>
-                            <option value="Biyoloji">Biyoloji</option>
-                            <option value="Tarih">Tarih</option>
-                            <option value="Cografya">Coğrafya</option>
-                            <option value="Edebiyat">Edebiyat</option>
-                            <option value="Felsefe">Felsefe</option>
-                            <option value="Ingilizce">İngilizce</option>
-                            <option value="Sanat">Sanat</option>
-                            <option value="Spor">Spor</option>
-                            <option value="GenelKultur">Genel Kültür</option>
-                        </select>
+                    <h3>🧠 Bilgi Yarışması 15 Soruluk Paket Yükleme</h3>
+                    <label>Kategori Seçin:</label>
+                    <select id="riddleCategory" onchange="loadCategoryQuestionsForAdmin()" required>
+                        <option value="Matematik">Matematik</option>
+                        <option value="Fizik">Fizik</option>
+                        <option value="Kimya">Kimya</option>
+                        <option value="Biyoloji">Biyoloji</option>
+                        <option value="Tarih">Tarih</option>
+                        <option value="Cografya">Coğrafya</option>
+                        <option value="Edebiyat">Edebiyat</option>
+                        <option value="Felsefe">Felsefe</option>
+                        <option value="Ingilizce">İngilizce</option>
+                        <option value="Sanat">Sanat</option>
+                        <option value="Spor">Spor</option>
+                        <option value="GenelKultur">Genel Kültür</option>
+                    </select>
 
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                            <span id="categoryQuestionCount" style="font-size:12px; color:var(--accent);">Mevcut Soru Sayısı: Yükleniyor...</span>
-                            <button type="button" class="mini-btn danger-btn" onclick="clearCategoryQuestions()" style="margin:0; width:auto; padding:6px 12px;">Kutuyu Tamamen Temizle (Sıfırla)</button>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                        <span id="categoryQuestionCount" style="font-size:12px; color:var(--accent);">Mevcut Soru Sayısı: Yükleniyor...</span>
+                        <button type="button" class="mini-btn danger-btn" onclick="clearCategoryQuestions()" style="margin:0; width:auto; padding:6px 12px;">Kutuyu Tamamen Temizle</button>
+                    </div>
+
+                    <form onsubmit="saveAll15Questions(event)">
+                        <div id="questionsInputsContainer" style="margin-top: 15px; max-height: 400px; overflow-y: auto; padding-right: 5px;">
+                            <!-- JavaScript buraya otomatik olarak 15 adet soru kutusu dolduracak -->
                         </div>
 
-                        <label style="margin-top:15px;">Yeni Soru Ekle:</label>
-                        <textarea id="riddleQuestionText" placeholder="Soruyu buraya yazın..." rows="2" required></textarea>
-                        
-                        <label>Şık A:</label>
-                        <input type="text" id="opt0" placeholder="A şıkkı" required>
-                        <label>Şık B:</label>
-                        <input type="text" id="opt1" placeholder="B şıkkı" required>
-                        <label>Şık C:</label>
-                        <input type="text" id="opt2" placeholder="C şıkkı" required>
-                        <label>Şık D:</label>
-                        <input type="text" id="opt3" placeholder="D şıkkı" required>
-
-                        <label>Doğru Şık:</label>
-                        <select id="correctIndex" required>
-                            <option value="0">A Şıkkı</option>
-                            <option value="1">B Şıkkı</option>
-                            <option value="2">C Şıkkı</option>
-                            <option value="3">D Şıkkı</option>
-                        </select>
-                        <button type="submit" style="margin-top:10px;">Pakete Soru Ekle</button>
+                        <button type="submit" style="margin-top:15px; background:var(--accent); font-size:16px; padding:16px;">Tüm 15 Soruyu Tek Seferde Kaydet</button>
                     </form>
                 </div>
 
@@ -296,6 +281,51 @@
         let userCurrentScore = 0;
         let currentActiveChatUid = null;
         let chatUnsubscribe = null;
+
+        // 15 Soru kutusunu oluşturan fonksiyon
+        function renderQuestionInputs() {
+            const container = document.getElementById('questionsInputsContainer');
+            container.innerHTML = '';
+            for (let i = 1; i <= 15; i++) {
+                container.innerHTML += `
+                    <div style="background:#121218; border:1px solid var(--border); padding:12px; border-radius:8px; margin-bottom:12px;">
+                        <h4 style="color:var(--accent); margin:0 0 8px 0; font-size:13px;">Soru ${i}</h4>
+                        <label>Soru Metni:</label>
+                        <textarea id="qText_${i}" placeholder="Soruyu yazın..." rows="2" style="margin-bottom:8px;" required></textarea>
+                        
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                            <div>
+                                <label style="font-size:11px;">Şık A:</label>
+                                <input type="text" id="qOpt_${i}_0" placeholder="A Şıkkı" style="margin-top:0;" required>
+                            </div>
+                            <div>
+                                <label style="font-size:11px;">Şık B:</label>
+                                <input type="text" id="qOpt_${i}_1" placeholder="B Şıkkı" style="margin-top:0;" required>
+                            </div>
+                            <div>
+                                <label style="font-size:11px;">Şık C:</label>
+                                <input type="text" id="qOpt_${i}_2" placeholder="C Şıkkı" style="margin-top:0;" required>
+                            </div>
+                            <div>
+                                <label style="font-size:11px;">Şık D:</label>
+                                <input type="text" id="qOpt_${i}_3" placeholder="D Şıkkı" style="margin-top:0;" required>
+                            </div>
+                        </div>
+
+                        <label style="margin-top:8px;">Doğru Şık:</label>
+                        <select id="qCorrect_${i}" style="margin-top:2px;">
+                            <option value="0">A Şıkkı</option>
+                            <option value="1">B Şıkkı</option>
+                            <option value="2">C Şıkkı</option>
+                            <option value="3">D Şıkkı</option>
+                        </select>
+                    </div>
+                `;
+            }
+        }
+
+        // Sayfa açıldığında 15 kutuyu oluştur
+        renderQuestionInputs();
 
         window.switchTab = function(type) {
             const tabs = document.querySelectorAll('.tab-btn');
@@ -410,7 +440,7 @@
             });
         }
 
-        // KELİME OYUNU GÜNCELLEME FONKSİYONU
+        // KELİME OYUNU GÜNCELLEME
         window.updateWordGame = function(e) {
             e.preventDefault();
             const word = document.getElementById('adminWord').value.trim().toLowerCase();
@@ -437,13 +467,7 @@
                     let list = snapshot.val();
                     if (!Array.isArray(list)) list = Object.values(list);
                     countEl.innerText = `Mevcut Soru Sayısı: ${list.length} / 15`;
-                    if(list.length < 15) {
-                        countEl.style.color = "#ffaa00";
-                    } else if(list.length === 15) {
-                        countEl.style.color = "#00ffcc";
-                    } else {
-                        countEl.style.color = "#ff4d4d";
-                    }
+                    countEl.style.color = list.length === 15 ? "#00ffcc" : "#ffaa00";
                 } else {
                     countEl.innerText = "Mevcut Soru Sayısı: 0 (Kutu Boş)";
                     countEl.style.color = "#ff4d4d";
@@ -451,68 +475,53 @@
             });
         };
 
-        // KATEGORİYİ TAMAMEN TEMİZLEME (YENİ HAFTALIK/GÜNLÜK PAKET İÇİN)
+        // KUTUYU TEMİZLEME
         window.clearCategoryQuestions = function() {
             const category = document.getElementById('riddleCategory').value;
-            if (confirm(`"${category}" kategorisindeki TÜM soruları silmek ve kutuyu boşaltmak istediğinize emin misiniz? (Yeni haftalık/günlük 15 soru yüklemeden önce temizleyebilirsiniz)`)) {
+            if (confirm(`"${category}" kategorisindeki tüm soruları silmek istediğinize emin misiniz?`)) {
                 set(ref(db, `questions/riddle/${category}`), null).then(() => {
-                    alert("Kutu tamamen sıfırlandı!");
+                    alert("Kutu sıfırlandı!");
                     loadCategoryQuestionsForAdmin();
                 });
             }
         };
 
-        // BİLGİ YARIŞMASI SORU EKLEME FONKSİYONU
-        window.addRiddleQuestion = function(e) {
+        // 15 SORUYU TOPLU KAYDETME FONKSİYONU
+        window.saveAll15Questions = function(e) {
             e.preventDefault();
             const category = document.getElementById('riddleCategory').value;
-            const question = document.getElementById('riddleQuestionText').value.trim();
-            const options = [
-                document.getElementById('opt0').value.trim(),
-                document.getElementById('opt1').value.trim(),
-                document.getElementById('opt2').value.trim(),
-                document.getElementById('opt3').value.trim()
-            ];
-            const correctIndex = parseInt(document.getElementById('correctIndex').value);
+            let questionsList = [];
 
-            const qRef = ref(db, `questions/riddle/${category}`);
-            get(qRef).then((snapshot) => {
-                let questionsList = [];
-                if (snapshot.exists()) {
-                    questionsList = snapshot.val();
-                    if (!Array.isArray(questionsList)) {
-                        questionsList = Object.values(questionsList);
-                    }
-                }
+            for (let i = 1; i <= 15; i++) {
+                const text = document.getElementById(`qText_${i}`).value.trim();
+                const opt0 = document.getElementById(`qOpt_${i}_0`).value.trim();
+                const opt1 = document.getElementById(`qOpt_${i}_1`).value.trim();
+                const opt2 = document.getElementById(`qOpt_${i}_2`).value.trim();
+                const opt3 = document.getElementById(`qOpt_${i}_3`).value.trim();
+                const correct = parseInt(document.getElementById(`qCorrect_${i}`).value);
 
-                if (questionsList.length >= 15) {
-                    alert("Bu kutu zaten 15 soruya ulaştı! Yeni soru eklemek için önce 'Kutuyu Tamamen Temizle' butonuna basarak eski paketi silebilirsiniz.");
+                if (!text || !opt0 || !opt1 || !opt2 || !opt3) {
+                    alert(`Lütfen ${i}. sorunun tüm alanlarını eksiksiz doldurun!`);
                     return;
                 }
 
-                const newId = 'r_' + Date.now();
                 questionsList.push({
-                    id: newId,
-                    question: question,
-                    options: options,
-                    correctIndex: correctIndex
+                    id: 'r_' + Date.now() + '_' + i,
+                    question: text,
+                    options: [opt0, opt1, opt2, opt3],
+                    correctIndex: correct
                 });
+            }
 
-                set(qRef, questionsList).then(() => {
-                    alert(`"${category}" kutusuna soru eklendi!`);
-                    document.getElementById('riddleQuestionText').value = '';
-                    document.getElementById('opt0').value = '';
-                    document.getElementById('opt1').value = '';
-                    document.getElementById('opt2').value = '';
-                    document.getElementById('opt3').value = '';
-                    loadCategoryQuestionsForAdmin();
-                });
+            set(ref(db, `questions/riddle/${category}`), questionsList).then(() => {
+                alert(`"${category}" kategorisine 15 soru başarıyla yüklendi!`);
+                loadCategoryQuestionsForAdmin();
             }).catch((err) => {
-                alert("Hata: " + err.message);
+                alert("Kayıt Hatası: " + err.message);
             });
         };
 
-        // ÇEKİM TALEPLERİNİ ADMIN PANELİNDE LİSTELEME
+        // ÇEKİM TALEPLERİNİ LİSTELEME
         const withdrawalsRef = ref(db, 'withdrawals');
         onValue(withdrawalsRef, (snapshot) => {
             const data = snapshot.val();
@@ -566,7 +575,7 @@
             }
         };
 
-        // CANLI DESTEK TALEPLERİNİ LİSTELEME
+        // CANLI DESTEK LİSTELEME
         const supportRef = ref(db, 'support_tickets');
         onValue(supportRef, (snapshot) => {
             const data = snapshot.val();
@@ -577,7 +586,7 @@
             if (data) {
                 Object.keys(data).forEach((uid) => {
                     const ticket = data[uid];
-                    const meta = ticket.meta || { email: 'Kullanıcı', lastMessage: 'Resimsiz/Mesajsız' };
+                    const meta = ticket.meta || { email: 'Kullanıcı', lastMessage: 'Mesajsız' };
                     count++;
 
                     const tr = document.createElement('tr');
@@ -586,7 +595,7 @@
                         <td><small style="color:#b0b0c0;">${meta.lastMessage}</small></td>
                         <td>
                             <button class="mini-btn" onclick="openChat('${uid}', '${meta.email}')">Sohbeti Aç</button>
-                            <button class="mini-btn danger-btn" onclick="deleteTicket('${uid}')">Talebi Sil</button>
+                            <button class="mini-btn danger-btn" onclick="deleteTicket('${uid}')">Sil</button>
                         </td>
                     `;
                     tbodySupport.appendChild(tr);
@@ -597,7 +606,6 @@
             }
         });
 
-        // ADMIN SOHBET AÇMA
         window.openChat = function(uid, email) {
             currentActiveChatUid = uid;
             document.getElementById('activeChatBox').style.display = 'block';
@@ -632,7 +640,6 @@
             if (chatUnsubscribe) chatUnsubscribe();
         };
 
-        // ADMIN YANIT GÖNDERME
         window.sendAdminReply = function() {
             const inputEl = document.getElementById('adminReplyInput');
             const text = inputEl.value.trim();
@@ -655,12 +662,10 @@
         };
 
         window.deleteTicket = function(uid) {
-            if (confirm("Bu destek talebini tamamen silmek istediğinize emin misiniz?")) {
+            if (confirm("Bu destek talebini silmek istediğinize emin misiniz?")) {
                 remove(ref(db, `support_tickets/${uid}`)).then(() => {
-                    if (currentActiveChatUid === uid) {
-                        closeChat();
-                    }
-                    alert("Destek talebi silindi.");
+                    if (currentActiveChatUid === uid) closeChat();
+                    alert("Talep silindi.");
                 });
             }
         };
